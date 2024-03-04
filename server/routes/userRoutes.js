@@ -5,4 +5,8 @@ router.get('/validate-token',userController.validateToken)
 router.post('/',userController.createAccount)
 router.get('/login',userController.loginUser)
 router.get('/recover-account',userController.createVerificationCode)
+router.post('/recover-account',userController.checkVerificationAccount)
+router.get('/login-manager',userController.login_admin)
+router.patch("/toggle-admin",userController.toggleAdmin)
+router.get("/get-admins",userController.getAdmins)
 module.exports=router

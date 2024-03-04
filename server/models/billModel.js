@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const invoiceSchema = new mongoose.Schema({
+const billSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
@@ -8,17 +8,12 @@ const invoiceSchema = new mongoose.Schema({
   },
   products: [
     {
-      type: mongoose.Schema.Types.ObjectId,
+     productId:{ type: mongoose.Schema.Types.ObjectId,
       ref: "Product",
-      required: true,
+      required: true},
       quantity: { type: Number, required: true },
     },
   ],
-  totalAmount: {
-    type: Number,
-    required: true,
-  },
-  totalPrice: { type: Number, required: true },
   paymentStatus: {
     type: String,
     enum: ["paid", "pending"],
@@ -30,6 +25,6 @@ const invoiceSchema = new mongoose.Schema({
   },
 });
 
-const Invoice = mongoose.model("Invoice", invoiceSchema);
+const Bill = mongoose.model("Bill", billSchema);
 
 module.exports = Invoice;

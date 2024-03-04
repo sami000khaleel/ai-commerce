@@ -1,6 +1,14 @@
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
+  publishedProducts: [{productId:{ type: mongoose.SchemaTypes.ObjectId, ref: "Product" },quatity:{type:Number,required:true}}],
+  purshasedProducts: [{ type: mongoose.SchemaTypes.ObjectId, ref: "Product" ,quatity:{type:Number,required:true}}],
+  role: {
+    type: String,
+    required: true,
+    default: "customer",
+    emun: ["customer", "admin", "manager"],
+  },
   name: {
     type: String,
     required: true,
@@ -32,20 +40,16 @@ const userSchema = new mongoose.Schema({
       ref: "Invoice",
     },
   ],
-  wishlist: [
+  verificationCodes: [
     {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Product",
+      code: Number,
+      createdAt: {
+        requried: true,
+        type: Date,
+        default: Date.now(),
+      },
     },
   ],
-  verificationCodes:[{
-    code:Number,
-    createdAt:{
-      requried:true,
-      type:Date,
-      default:Date.now()
-    }
-  }]
 });
 
 const User = mongoose.model("User", userSchema);
