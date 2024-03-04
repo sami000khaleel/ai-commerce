@@ -1,12 +1,11 @@
 const mongoose = require("mongoose");
 
 const productSchema = new mongoose.Schema({
-  publisherId:{type:mongoose.SchemaTypes.ObjectId,ref:"User"},
+  publisherId: { type: mongoose.SchemaTypes.ObjectId, ref: "User" },
   attributes: [],
   reviews: [
     {
-      userId:{ type:mongoose.SchemaTypes.ObjectId,
-      ref:"User"},
+      userId: { type: mongoose.SchemaTypes.ObjectId, ref: "User" },
       comment: {
         required: true,
         type: String,
@@ -50,10 +49,20 @@ const productSchema = new mongoose.Schema({
       required: true,
     },
   ],
-  quantity: {
-    type: Number,
-    required: true,
-  },
+  quantities: [
+    {
+      size: {
+        type: String,
+        required: true,
+        enum: ["XS", "S", "L", "XL", "XXL", "XXXL"],
+      },
+      quantity: {
+        type: Number,
+        required: true,
+        min: 0,
+      },
+    },
+  ],
   createdAt: {
     type: Date,
     default: Date.now(),

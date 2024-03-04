@@ -2,6 +2,7 @@ const Product=require('../models/productModel')
 const productMiddleware=require('../middlewares/productMiddleware')
 const User=require('../models/userModel')
 const fs=require('fs')
+const billMiddlware=require('../middlewares/billMiddleware')
 const authentication = require('../middlewares/authentication')
 const userMiddleware = require('../middlewares/userMiddleware')
 const {handleError, throwError}=require('../errorHandler')
@@ -9,6 +10,30 @@ const {promisify}=require('util')
 const access=promisify(fs.access)
 const path=require('path')
 class productController{
+    static async buyProduct(req,res){
+        try
+        {
+            const token=await authentication.validateToken(req.headers['token'])
+            const user=await User.findById(token.userId)
+            const sentProducts=req.body.products
+            let products=[]
+            for(let sentProduct of sentProducts)
+                { 
+                    let product=await Product.findById(sentProduct.productId)
+                    await productMiddleware.checkForQuantity(product,sentProduct.quantities)
+                    product=productMiddleware.subtractQuantities(product,sentProduct.quantities)
+                    product.purchasedQuantities=sentProduct.quantities
+                    products.push(product)    
+                }
+                user=userMiddleware.addPurchasedProducts(user,products) 
+                let bill=await billMiddlware.createBill(products,user)
+                bill.totalPrice=billMiddlware.calculateTotalPrice(bill,products)
+                return res.json({success:true,bill})
+            }
+        catch(err){
+            handleError(err,res)
+        }
+    }
     static async deleteProduct(req,res){
         try
         {
@@ -109,7 +134,7 @@ static async createProduct(req,res){
         await productMiddleware.validateProduct_preInit(product)
         // do some stuff on it later to be added
         product=await Product.create(product)
-        user=await userMiddleware.addPublishedProduct(user,product.id,product.quantity)
+        user=await userMiddleware.addPublishedProduct(user,product.id)
         const images=[]
         const imagespaths=await productMiddleware.generateImagesPath(req.files,product.id)
         product= await productMiddleware.saveImages(imagespaths,req.files,product)        

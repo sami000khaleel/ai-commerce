@@ -8,6 +8,23 @@ const access=promisify(fs.access)
 const unlink=promisify(fs.unlink)
 const {throwError}=require('../errorHandler')
 class productMiddleware{
+    static subtractQuantities(product, quantities) {
+        for (let { size, quantity } of quantities) {
+            const existingQuantityIndex = product.quantities.findIndex(q => q.size === size);
+            if (existingQuantityIndex !== -1) {
+                product.quantities[existingQuantityIndex].quantity -= quantity;
+            }
+        }
+        return product;
+    }
+    static async checkForQuantity(product, quantities) {
+        for (let { size, quantity } of quantities) {
+            const availableQuantity = product.quantities.find(q => q.size === size)?.quantity;
+            if (!availableQuantity || availableQuantity < quantity) {
+                throwError(`Insufficient quantity available for product: ${product.name}`, 400);
+            }
+        }
+    }
    static makeConditions(category,max,min){
     let conditions={}
 if(category)
@@ -64,9 +81,20 @@ return conditions
             product.category = query.category;
         }
 
-        if (query.quantity) {
-            product.quantity = query.quantity;
+        if (query.quantities) {
+            // Assuming query.quantities is an array of size-quantity pairs
+            query.quantities.forEach(updatedQuantity => {
+                const existingQuantity = product.quantities.find(q => q.size === updatedQuantity.size);
+                if (existingQuantity) {
+                    existingQuantity.quantity = updatedQuantity.quantity;
+                } else {
+                    // If the size doesn't exist, you might want to add it
+                    product.quantities.push(updatedQuantity);
+                }
+            });
         }
+    
+    
 
         
         return product;
@@ -127,8 +155,13 @@ return conditions
             if (!Array.isArray(product.imagesUrls) || product.imagesUrls.some(url => typeof url !== 'string')) {
                 throw new Error(`'imagesUrls' must be an array of strings.`);
             }
-            if (typeof product.quantity !== 'number' || isNaN(product.quantity) || product.quantity < 0) {
-                throw new Error(`'quantity' must be a non-negative number.`);
+            for (const { size, quantity } of product.quantities) {
+                if (typeof size !== 'string' || !['XS', 'S', 'L', 'XL', 'XXL', 'XXXL'].includes(size)) {
+                    throw new Error(`Invalid size '${size}'.`);
+                }
+                if (typeof quantity !== 'number' || isNaN(quantity) || quantity < 0) {
+                    throw new Error(`Invalid quantity '${quantity}'.`);
+                }
             }
             if (!(product.createdAt instanceof Date && !isNaN(product.createdAt))) {
                 throw new Error(`'createdAt' must be a valid Date object.`);

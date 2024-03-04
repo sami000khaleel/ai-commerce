@@ -1,8 +1,21 @@
 const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema({
-  publishedProducts: [{productId:{ type: mongoose.SchemaTypes.ObjectId, ref: "Product" },quatity:{type:Number,required:true}}],
-  purshasedProducts: [{ type: mongoose.SchemaTypes.ObjectId, ref: "Product" ,quatity:{type:Number,required:true}}],
+  publishedProducts: [{ type: mongoose.SchemaTypes.ObjectId, ref: "Product" }],
+  purchasedProducts: [{productId:{ type: mongoose.SchemaTypes.ObjectId, ref: "Product"} , quantities: [
+    {
+      size: {
+        type: String,
+        required: true,
+        enum: ["XS", "S", "L", "XL", "XXL", "XXXL"],
+      },
+      quantity: {
+        type: Number,
+        required: true,
+        min: 0,
+      },
+    },
+  ],}],
   role: {
     type: String,
     required: true,

@@ -7,4 +7,5 @@ router.get('/:productId',productController.getProduct)
 router.get('/',productController.getProducts)
 router.get('/images',productController.getImage)
 router.patch('/',productController.updateProduct)
+router.delete('/',productController.deleteProduct)
 module.exports=router

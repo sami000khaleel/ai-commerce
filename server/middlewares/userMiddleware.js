@@ -4,8 +4,19 @@ class userMiddleware{
     constructor (){
 
     }
+    static async addPurchasedProducts(user, products) {
+      try {
+          for (let { _id, purchasedQuantities } of products) {
+              const purchasedProduct = { productId: _id, quantities: purchasedQuantities };
+              user.purchasedProducts.push(purchasedProduct);
+          }
+          return user;
+      } catch (error) {
+          throwError('Error adding purchased products to user', 500);
+      }
+  }
     static async addPublishedProduct(user,productId,quantity){
-      user.publishedProducts.push({productId,quantity})
+      user.publishedProducts.push(productId)
       
       await user.save()
       console.log(user.publishedProducts)

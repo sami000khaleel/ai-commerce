@@ -11,7 +11,20 @@ const billSchema = new mongoose.Schema({
      productId:{ type: mongoose.Schema.Types.ObjectId,
       ref: "Product",
       required: true},
-      quantity: { type: Number, required: true },
+      quantities: [
+        {
+          size: {
+            type: String,
+            required: true,
+            enum: ["XS", "S", "L", "XL", "XXL", "XXXL"],
+          },
+          quantity: {
+            type: Number,
+            required: true,
+            min: 0,
+          },
+        },
+      ],
     },
   ],
   paymentStatus: {
@@ -27,4 +40,4 @@ const billSchema = new mongoose.Schema({
 
 const Bill = mongoose.model("Bill", billSchema);
 
-module.exports = Invoice;
+module.exports = Bill;
