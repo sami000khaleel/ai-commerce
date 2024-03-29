@@ -2,14 +2,92 @@ const Product=require('../models/productModel')
 const productMiddleware=require('../middlewares/productMiddleware')
 const User=require('../models/userModel')
 const fs=require('fs')
+const formData = require('form-data');
+const multer = require('multer');
 const billMiddlware=require('../middlewares/billMiddleware')
 const authentication = require('../middlewares/authentication')
 const userMiddleware = require('../middlewares/userMiddleware')
 const {handleError, throwError}=require('../errorHandler')
 const {promisify}=require('util')
-const access=promisify(fs.access)
+const access=promisify(fs.access,fs.writeFile)
 const path=require('path')
 class productController{
+    static async searchByImage(req,res){
+        try
+        {
+            
+
+//             let data = '';
+
+//   req.on('data', chunk => {
+//     data += chunk;
+//   });
+
+//   req.on('end', async() => {
+//     // Parse the multipart form data
+//     const boundary = req.headers['content-type'].split('boundary=')[1];
+//     const parts = data.split(`--${boundary}`);
+
+//     // Iterate over each part of the form data
+//     for (let i = 0; i < parts.length - 1; i++) {
+//       // Extract the filename if present
+//       const filenameMatch = parts[i].match(/filename="(.+?)"/);
+//       const filename = filenameMatch ? filenameMatch[1] : 'No filename provided';
+
+//       // Extract the content of the part
+//       const contentMatch = parts[i].match(/\r\n\r\n([\s\S]*)$/);
+//       const content = contentMatch ? contentMatch[1] : '';
+      
+//       // Save the content to a file
+//       if (filename !== 'No filename provided' && content) {
+//         const filePath = path.join(uploadsDir, filename);
+//        await fs.writeFile(filePath, content);
+//         console.log(`File saved: ${filePath}`);
+//       }
+//     }
+
+//   });
+const { userId } = await authentication.validateToken(req.headers['token']);
+const uploadDir = path.join(__dirname, '..','uploads');
+
+// Check if the uploads directory exists, create it if it doesn't
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
+}
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, uploadDir); // Destination folder for uploaded files
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname)); // Rename files to avoid collisions
+  }
+});
+
+const upload = multer({ storage }).single('file');
+
+upload(req, res, async (err) => {
+  if (err) {
+    console.error('Error uploading file:', err);
+    return res.status(500).send('Internal Server Error');
+  }
+
+  // File is uploaded, you can access it via req.file
+  const filePath = req.file.path;
+  console.log('File saved at:', filePath);
+  let similarities=await productMiddleware.sendFile(filePath)
+  // Respond with a success message
+  console.log(similarities)
+    similarities=productMiddleware.extractImagesNames(similarities)
+  const results=await productMiddleware.matchProductsByImages(similarities)
+  console.log('done')
+  return res.json(results); // Assuming places is defined elsewhere in your code
+});
+        }catch(err){
+            console.log(err)
+            handleError(err,res)
+        }
+    }
     static async buyProduct(req,res){
         try
         {
@@ -61,7 +139,7 @@ class productController{
             if(!req.query?.imageName||!req.query?.productId)
                 return throwError('missing parameters',400)
             const{imageName,productId}=req.query
-            const imagePath = path.join(__dirname, '..', 'uploads', productId, imageName);
+            const imagePath = path.join(__dirname, '..', 'data', productId, imageName);
             await access(imagePath).catch(err=>throwError(`image was found`,404))
             return res.sendFile(imagePath)
 

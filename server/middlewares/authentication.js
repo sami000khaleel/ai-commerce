@@ -169,7 +169,6 @@ class authentication {
   }
   static async validateToken(token) {
     try{
-
       const result = await jwt.verify(token, process.env.JWT_SECRET);
       return result;
     }catch(err){

@@ -3,3 +3,10 @@ images
 assets
 .env
 testscript.js
+*.jpg
+*.pkl
+*.csv
+*.py
+*.ipynb
+*.pyc
+.md

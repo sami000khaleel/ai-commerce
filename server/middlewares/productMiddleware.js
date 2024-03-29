@@ -3,11 +3,40 @@ const path=require('path')
 const fs=require('fs')
 const { promisify } = require('util');
 const mkdir=promisify(fs.mkdir)
+const axios = require('axios');
 const writeFile=promisify(fs.writeFile)
 const access=promisify(fs.access)
 const unlink=promisify(fs.unlink)
 const {throwError}=require('../errorHandler')
+const FormData = require('form-data');
 class productMiddleware{
+    static extractImagesNames(similarities)
+    {
+        for (let similarity of similarities)
+            similarity[0]=similarity[0].split('\\')[2]
+        
+        return similarities
+        }
+    static async matchProductsByImages(similarities){
+        let products=[]
+        for (let similarity of similarities){
+            let product=await Product.findOne({imagesNames:{$in:[similarity[0]]}})
+            products.push({product,probability:similarity[1]})
+        }
+        return products
+    }
+    static async sendFile(filePath){
+    const formData=new FormData()
+    formData.append('file',fs.createReadStream(filePath))
+    console.log({... formData.getHeaders()})
+    const response=await axios.post(process.env.SIMILARITY_URL,formData,{
+        headers:{
+            ...formData.getHeaders(),
+            Authorization :`Bearer ${process.env.SERVER_TOKEN}`
+        }
+    })
+    return response.data.similarities
+    }
     static subtractQuantities(product, quantities) {
         for (let { size, quantity } of quantities) {
             const existingQuantityIndex = product.quantities.findIndex(q => q.size === size);
