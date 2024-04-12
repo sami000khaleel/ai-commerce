@@ -10,3 +10,5 @@ testscript.js
 *.ipynb
 *.pyc
 .md
+.json
+.xlsx
