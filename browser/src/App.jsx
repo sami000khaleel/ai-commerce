@@ -4,14 +4,16 @@ import Footer from './components/Footer'
 import Navbar from './components/Navbar/Navbar'
 import { Outlet } from "react-router-dom";
 import './index.css'
+import ModalPopup from "./components/ModalPopup/ModalPopup";
 import Cookies from "js-cookies";
 const App = () => {
- 
-  return (
+ const [error,setError]=useState({message:'',status:null})
+
+ return (
     <main className="min-h-screen relative">
       <Navbar/>
-      <section id='outlet'>
-      <Outlet />
+      <section id='outlet ' className="mt-20 flex justify-center items-center">
+      <Outlet  />
       </section>
       <Footer/>
     </main>

@@ -9,4 +9,7 @@ router.post('/recover-account',userController.checkVerificationAccount)
 router.get('/login-manager',userController.login_admin)
 router.patch("/toggle-admin",userController.toggleAdmin)
 router.get("/get-admins",userController.getAdmins)
+router.get("/get-countries",userController.getCountries)
+router.get("/get-cities",userController.getCities)
+router.patch("/reset-password",userController.resetPassword)
 module.exports=router

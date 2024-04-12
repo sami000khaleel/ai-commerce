@@ -3,6 +3,7 @@ const csv = require('csv-parser');
 const mongoose = require("mongoose");
 const Product = require('./models/productModel'); // Assuming your product model is in this path
 const path = require('path');
+const xlsx = require('xlsx');
 // mongoose.connect('mongodb://127.0.0.1:27017/ai-commerce', {
 //   useNewUrlParser: true,
 //   useUnifiedTopology: true
@@ -145,4 +146,54 @@ function acheck(){
   console.log(expression)
 
 }
-acheck()
+// acheck()
+
+function getCountriesAndCities() {
+  // Read the Excel file
+  let workbook = xlsx.readFile('./worldcities.xlsx');
+
+  // Assuming the data is in the first sheet
+  let sheetName = workbook.SheetNames[0];
+  let sheet = workbook.Sheets[sheetName];
+
+  // Convert the sheet data to JSON
+  let data = xlsx.utils.sheet_to_json(sheet);
+
+  // Organize data into the desired format
+  let countriesAndCities = {};
+
+  data.forEach(row => {
+      let country = row.country;
+      let city = row.city;
+
+      if (!countriesAndCities[country]) {
+          countriesAndCities[country] = [];
+      }
+
+      countriesAndCities[country].push(city);
+  });
+
+  // Convert to the final format
+  let countriesAndCitiesArray = [];
+
+  for (let country in countriesAndCities) {
+      countriesAndCitiesArray.push({
+          country: country,
+          cities: countriesAndCities[country]
+      });
+  }
+
+  return countriesAndCitiesArray;
+}
+
+// Write the data to a JSON file
+function writeToFile(data) {
+  fs.writeFileSync('countries_and_cities.json', JSON.stringify(data, null, 2));
+}
+
+// Usage
+let countriesAndCities = getCountriesAndCities();
+// writeToFile(countriesAndCities);
+function updateImagesNames(){
+  
+}

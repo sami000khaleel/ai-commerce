@@ -12,6 +12,20 @@ const {promisify}=require('util')
 const access=promisify(fs.access,fs.writeFile)
 const path=require('path')
 class productController{
+    static async getRandomProducts(req,res){
+        try
+        {
+            console.log(req.headers.token)
+            await authentication.validateToken(req.headers['token'])
+            if(!req.query?.batch)
+                throwError('do not try to hack',404)
+            const batch=req.query.batch
+            const products=await productMiddleware.getRandomProducts(batch)
+            return res.json({success:true,products})
+        }catch(err){
+            handleError(err,res)
+        }
+    }
     static async searchByImage(req,res){
         try
         {

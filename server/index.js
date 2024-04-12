@@ -9,7 +9,9 @@ async function createServer() {
     const app = express();
     await mongoose.connect(process.env.DATABASE_URL);
     console.log("connected to database");
-    app.use(cors());
+    app.use(cors({
+      exposedHeaders:'token'
+    }));
     app.use(express.urlencoded({extended:true}))
     app.use(express.json())
     app.use('/api/user',userRouter)

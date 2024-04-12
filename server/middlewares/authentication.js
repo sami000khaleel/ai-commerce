@@ -3,6 +3,7 @@ const User = require("../models/userModel.js");
 const axios = require("axios");
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { throwError } = require('../errorHandler.js');
 class authentication {
   constructor() {}
   static async createVerificationCode(user){
@@ -39,7 +40,7 @@ class authentication {
     {
      const timeGapSeconds=Date.now()-user.verificationCodes[user.verificationCodes.length-1].createdAt
       if(timeGapSeconds<30000)
-        throw new Error(` يجب أن تدخل الرمز السري خلال 30 ثانية من استلامه `)
+        throw new Error(`you have to type the code within 30 seconds from recieving it.`)
     }
     catch(error){
       console.log(error)
@@ -91,12 +92,11 @@ class authentication {
       return res;
     } catch (error) {
       console.error(error);
-      throw error;
+      throwError('incorrect password',400)
     }
   }
   static createToken(userId) {
     const token = jwt.sign({ userId }, process.env.JWT_SECRET, {
-      expiresIn: "1w",
     });
     return token;
   }
@@ -134,8 +134,7 @@ class authentication {
       const hashedPassword = await bcryptjs.hash(user.password, 10);
       return hashedPassword;
     } catch (error) {
-      console.log(error);
-      throw error;
+        throwError("error while dealing with you`r password")
     }
   }
   static async validateUserInfo(user) {
@@ -150,10 +149,7 @@ class authentication {
 
       // Validate password length
       if (user.password.length < 6) {
-        let err= new Error("Password should be at least 6 characters long");
-        err.internal=false
-        err.status=403
-        throw err
+          return throwError('password should be at least 6 characters long',400)
       }
 
       // Return the validated user information with the hashed password
@@ -169,13 +165,13 @@ class authentication {
   }
   static async validateToken(token) {
     try{
-      const result = await jwt.verify(token, process.env.JWT_SECRET);
+      if(!token)
+        throwError('no token was provided',400)
+        const result = await jwt.verify(token, process.env.JWT_SECRET)
       return result;
     }catch(err){
-      let error=new Error('error validating you token')
-      error.internal=false
-      error.status=400
-      throw error
+      
+      throwError('error validating you`r token.',400)
         }
       
   }

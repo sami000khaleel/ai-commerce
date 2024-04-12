@@ -2,7 +2,7 @@ import React from 'react'
 
 const CartNavifator = () => {
   return (
-    <svg
+    <svg key={3}
     xmlns="http://www.w3.org/2000/svg"
     width="24"
     height="24"

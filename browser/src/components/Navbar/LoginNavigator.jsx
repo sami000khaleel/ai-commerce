@@ -1,8 +1,9 @@
 import React from 'react'
-
+import {useNavigate} from 'react-router-dom'
 const LoginNavigator = () => {
+  const navigate=useNavigate()
   return (
-    <svg
+    <svg 
     xmlns="http://www.w3.org/2000/svg"
     width="24"
     height="24"

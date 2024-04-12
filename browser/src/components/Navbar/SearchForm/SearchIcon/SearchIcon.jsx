@@ -1,9 +1,14 @@
 import React from 'react';
 
-const SearchIcon = () => {
+const SearchIcon = ({searchQuery}) => {
+  function handleSearch(e){
+    e.preventDefault()
+
+  }
   return (
-    <div className="absolute inset-y-0 right-0">
+    <div key={9} id='search-icon' className="absolute right-0 -translate-y-[50%] top-[50%] z-50  ">
       <button
+      onClick={handleSearch}
         type="submit"
         className="inline-flex aspect-square w-10 items-center justify-center text-neutral-500 hover:text-neutral-700 focus:text-neutral-700 group-invalid:pointer-events-none group-invalid:opacity-80"
       >

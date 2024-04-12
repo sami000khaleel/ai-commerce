@@ -10,6 +10,20 @@ const unlink=promisify(fs.unlink)
 const {throwError}=require('../errorHandler')
 const FormData = require('form-data');
 class productMiddleware{
+     static async getRandomProducts(batch) {
+        const batchSize = 10;
+        let skipCount = 0;
+        if (batch > 1) {
+            skipCount = (batch - 1) * batchSize;
+        }
+    
+            const products = await Product.find()
+                .sort({ createdAt: -1 }) // Sort by createdAt field in descending order (newest to oldest)
+                .skip(skipCount) // Skip products based on batch number
+                .limit(batchSize); // Limit the number of products to fetch
+    
+            return products;
+    }
     static extractImagesNames(similarities)
     {
         for (let similarity of similarities)
@@ -99,6 +113,7 @@ return conditions
         }
 
         if (query.price) {
+            product.previousPrice=product.price
             product.price = query.price;
         }
 
