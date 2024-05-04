@@ -86,10 +86,11 @@ export default class api {
     }
   }
 
-  static async getProducts(category, min, max) {
+  static async getProducts(search,category, min='', max='') {
     try {
       const response = await axios.get(`${api.url}/product`, {
         params: {
+          search,
           category: category,
           min: min,
           max: max
@@ -149,14 +150,15 @@ export default class api {
     }
   }
 
-  static async buyProducts(productsData) {
+  static async buyProducts(cart) {
     try {
-      const response = await axios.post(`${api.url}/user/buy`, productsData, {
+      const response = await axios.post(`${api.url}/user/buy`, cart, {
         headers: {
           "Content-Type": "application/json",
           token: Cookies.getItem('token')
         }
       });
+      console.log(Cookies.getItem('token'))
        return response
     } catch (error) {
       console.error("Error buying products:", error);
@@ -194,10 +196,12 @@ export default class api {
   }
   static async verifyCode(email,code)
   {
+    console.log(email,code)
     try{
-     const response=await axios.post(`${api.url}/user/revocer-account`,{
-        email,headers:{
-          code
+     const response=await axios.post(`${api.url}/user/recover-account`,{email},{
+        headers:{
+          token:api.token
+          ,code:String(code)
         }
       })
       return response
@@ -295,7 +299,7 @@ export default class api {
         {
           headers: {
             "Content-Type": "application/json",
-            token: Cookies.getItem('token')
+            token: Cookies.token
           }
         }
       );

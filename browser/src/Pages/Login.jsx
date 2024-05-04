@@ -21,6 +21,7 @@ const Login = () => {
     try{
       setLoadingFlag(true)
       const response=await api.login(userData.email,userData.password)
+      localStorage.setItem('user',JSON.stringify(response.data.user))
       Cookies.setItem('token',response.headers.token)
       navigate('/home')
     }catch(err){
@@ -38,7 +39,10 @@ const Login = () => {
      <h1 className=' text-3xl' > login</h1> 
      <TextInput type='email' name='email' setUserData={setUserData} />
      <TextInput type='password' name='password' setUserData={setUserData} />
-     <Submit setModalState={setModalState} signupFlag={false} handleLogin={handleLogin} userData={userData} loginFlag={true}/>
+    <span className='flex flex-col justify-start items-start flex-wrap gap-3'>
+
+{loadingFlag?<h1 className='bg-black text-white rounded-lg p-3'>laoding</h1>:<Submit setModalState={setModalState} signupFlag={false} handleLogin={handleLogin} userData={userData} loginFlag={true}/>}    <h1 className='text-[rgb(145,145,145)]' >forgot your password? <Link to='/recover-account' className='p-2 rounded-lg text-black text-lg ' >restore the account</Link></h1>
+    </span>
       </form>
       <h1 className='mt-5' >already have an account? <Link to='/signup' className='bg-black text-white p-2 rounded-md' >signup</Link> </h1>
     </span>

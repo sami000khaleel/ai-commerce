@@ -1,12 +1,10 @@
 import React from 'react';
+import api from '../../../../api/api';
 
-const SearchIcon = ({searchQuery}) => {
-  function handleSearch(e){
-    e.preventDefault()
+const SearchIcon = ({handleSearch}) => {
 
-  }
   return (
-    <div key={9} id='search-icon' className="absolute right-0 -translate-y-[50%] top-[50%] z-50  ">
+    <div  id='search-icon' className="absolute right-0 -translate-y-[50%] top-[50%] z-50  ">
       <button
       onClick={handleSearch}
         type="submit"

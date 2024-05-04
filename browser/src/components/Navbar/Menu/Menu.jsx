@@ -1,13 +1,13 @@
 import React from 'react';
 
-const Menu = ({drawerMenuFlage,setDrawerMenuFlage}) => {
+const Menu = ({drawerMenuFlag,setDrawerMenuFlag}) => {
   function handleMenuClicked(e){
     e.preventDefault()
-    setDrawerMenuFlage((pre)=>!pre)
+    setDrawerMenuFlag((pre)=>!pre)
  }
   return (
-    !drawerMenuFlage?
-    <button  className='z-50 relative'    onClick={handleMenuClicked}
+    !drawerMenuFlag?
+    <button  className='z-50 relative mr-4 '    onClick={handleMenuClicked}
     >
 
     <svg
@@ -29,7 +29,7 @@ const Menu = ({drawerMenuFlage,setDrawerMenuFlage}) => {
     </svg>
       </button>
     :
-    <button className='z-50 relative' onClick={handleMenuClicked} >
+    <button className='z-50 relative mr-4' onClick={handleMenuClicked} >
     <svg className="z-50  lucide lucide-x h-6 w-6 shrink-0 cursor-pointer " xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"  aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
     </button>
   );

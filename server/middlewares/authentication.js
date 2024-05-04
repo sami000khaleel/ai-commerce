@@ -24,7 +24,7 @@ class authentication {
       const lastVerificationCode = user.verificationCodes[user.verificationCodes.length - 1];
   
       if (!lastVerificationCode || lastVerificationCode.code != code) {
-        throw new Error( {message:"Invalid verification code"} );
+        throw new Error( "Invalid verification code" );
         
       }
   
@@ -164,15 +164,11 @@ class authentication {
     }
   }
   static async validateToken(token) {
-    try{
       if(!token)
         throwError('no token was provided',400)
         const result = await jwt.verify(token, process.env.JWT_SECRET)
       return result;
-    }catch(err){
-      
-      throwError('error validating you`r token.',400)
-        }
+    
       
   }
 }

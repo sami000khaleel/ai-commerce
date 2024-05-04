@@ -12,4 +12,6 @@ router.get("/get-admins",userController.getAdmins)
 router.get("/get-countries",userController.getCountries)
 router.get("/get-cities",userController.getCities)
 router.patch("/reset-password",userController.resetPassword)
+router.post('/buy',userController.buyProduct)
+router.patch('/reset-password',userController.resetPassword)
 module.exports=router

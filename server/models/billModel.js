@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 
 const billSchema = new mongoose.Schema({
+  totalPrice:{
+    type:String,
+    required:true
+  },
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
@@ -8,10 +12,14 @@ const billSchema = new mongoose.Schema({
   },
   products: [
     {
+      price:{
+        required:true,
+        type:String
+      },
      productId:{ type: mongoose.Schema.Types.ObjectId,
       ref: "Product",
       required: true},
-      quantities: [
+      quantity: 
         {
           size: {
             type: String,
@@ -24,7 +32,7 @@ const billSchema = new mongoose.Schema({
             min: 0,
           },
         },
-      ],
+    
     },
   ],
   paymentStatus: {

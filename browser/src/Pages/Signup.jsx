@@ -4,11 +4,9 @@ import Submit from '../components/From/Submit/Submit'
 import { Link,useNavigate } from 'react-router-dom'
 import api from '../api/api'
 import ModalPopup from '../components/ModalPopup/ModalPopup'
-
+import { ArrowLeft,ArrowRight } from 'lucide-react'
 import Cookies from 'js-cookies'
 import SelectInput from '../components/From/SelectInput/SelectInput'
-import LeftArrow from '../assets/Svgs/LeftArrow'
-import RightArrow from '../assets/Svgs/RightArrow'
 const Signup = () => {
   const navigate=useNavigate()
   const [step,setStep]=useState(1)
@@ -23,6 +21,8 @@ const Signup = () => {
     email:'',
 
   })
+  useEffect(()=>window.scrollTo({top:0,behavior:'smooth'}),[])
+
   const [loadingFlag,setLoadingFlag]=useState(false)
   useEffect(()=>{
   async  function getCountries(){
@@ -88,18 +88,18 @@ setLoadingFlag(false)
         <TextInput value={userData.password} name='password' type='password' setUserData={setUserData}/>
         <button id='next step' className='absolute text-5xl  top-1/2 -translate-y-1/2 right-0 translate-x-1/2' onClick={e=>{e.preventDefault()
         setStep(2)
-        }} ><RightArrow/></button>
+        }} ><ArrowRight/></button>
 </>:null}
        { step==2?<>
         <SelectInput value={location.country} name='country' setLocation={setLocation} options={countries}/>
 {        location.country?<SelectInput  value={location.city} name='city' options={cities} setLocation={setLocation} />
 :<h1 className='block border relative p-3 w-full max-w-[205px] bg-[white]' >choose a country</h1>
 }        <TextInput value={location.address} name='address' type='text' setUserData={setLocation} />
-        <Submit location={location} setModalState={setModalState} loginFlage={false} signupFlag={true} handleLogin={null} handleSignup={handleSignup} userData={userData} />
+        {loadingFlag?<h1 className='bg-black text-white rounded-lg p-3'>laoding</h1>:<Submit location={location} setModalState={setModalState} loginFlage={false} signupFlag={true} handleLogin={null} handleSignup={handleSignup} userData={userData} />}
         <button id='next step' className='absolute text-5xl  top-1/2 -translate-y-1/2 left-0 -translate-x-1/2' onClick={e=>{e.preventDefault()
         setStep(1)
         }} >
-          <LeftArrow/>
+          <ArrowLeft/>
         </button>
         </>:null}
     

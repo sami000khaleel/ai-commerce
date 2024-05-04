@@ -1,9 +1,11 @@
 const User=require('../models/userModel.js')
-const {throwError}=require('../errorHandler')
+const {throwError}=require('../errorHandler');
+const billMiddlware = require('./billMiddleware.js');
 class userMiddleware{
     constructor (){
 
     }
+  
     static async addPurchasedProducts(user, products) {
       try {
           for (let { _id, purchasedQuantities } of products) {
@@ -51,6 +53,7 @@ class userMiddleware{
           throw new Error({success:false,message:"no user was found of this id"})
         user.role='manager'
         await user.save()
+      
         return user
       }
       catch(error){
@@ -77,7 +80,7 @@ class userMiddleware{
         try{
             const user=await User.findOne({email})
             if(!user)
-              throw new Error('this email does not exist')
+              throwError('this email does not exist',404)
             return user
         }
         catch(error)
