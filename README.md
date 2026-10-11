@@ -9,7 +9,8 @@
 [![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)](https://react.dev)
 [![Node.js](https://img.shields.io/badge/Node.js-Express-339933?logo=node.js&logoColor=white)](https://nodejs.org)
 [![MongoDB](https://img.shields.io/badge/MongoDB-7-47A248?logo=mongodb&logoColor=white)](https://mongodb.com)
-[![Python](https://img.shields.io/badge/Python-ResNet50-3776AB?logo=python&logoColor=white)](https://python.org)
+[![Python](https://img.shields.io/badge/Python-3.10+-3776AB?logo=python&logoColor=white)](https://python.org)
+[![PyTorch](https://img.shields.io/badge/ResNet50-EE4C2C?logo=pytorch&logoColor=white)](https://pytorch.org)
 [![JWT](https://img.shields.io/badge/Auth-JWT-000000?logo=jsonwebtokens&logoColor=white)](https://jwt.io)
 
 </div>
