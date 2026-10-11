@@ -34,7 +34,7 @@ The result is a working clothing store with:
 
 Every line is mine. Frontend, backend, AI integration, database design.
 
-**[🎥 Watch the  demo →]([ADD_YOUR_YOUTUBE_LINK_HERE](https://onedrive.live.com/?qt=allmyphotos&photosData=%2Fshare%2FCA524006C0AC4FC8%21s68b1fea510e5405a97537d9fe6745ec8%3Fithint%3Dvideo%26e%3DrEvwAF%26migratedtospo%3Dtrue&cid=CA524006C0AC4FC8&id=CA524006C0AC4FC8%21s68b1fea510e5405a97537d9fe6745ec8&redeem=aHR0cHM6Ly8xZHJ2Lm1zL3YvYy9jYTUyNDAwNmMwYWM0ZmM4L0VhWC1zV2psRUZwQWwxTjluLVowWHNnQnBpQ2NORXlxYlFCUndJZkppcmRlQmc%5FZT1yRXZ3QUY&v=photos))**
+[🎥 Watch the  demo →](https://onedrive.live.com/?qt=allmyphotos&photosData=%2Fshare%2FCA524006C0AC4FC8%21s68b1fea510e5405a97537d9fe6745ec8%3Fithint%3Dvideo%26e%3DrEvwAF%26migratedtospo%3Dtrue&cid=CA524006C0AC4FC8&id=CA524006C0AC4FC8%21s68b1fea510e5405a97537d9fe6745ec8&redeem=aHR0cHM6Ly8xZHJ2Lm1zL3YvYy9jYTUyNDAwNmMwYWM0ZmM4L0VhWC1zV2psRUZwQWwxTjluLVowWHNnQnBpQ2NORXlxYlFCUndJZkppcmRlQmc%5FZT1yRXZ3QUY&v=photos)
 
 ---
 
@@ -207,8 +207,6 @@ Start the backend:
 node index.js
 ```
 
-> ⚠️ **Known issue:** `index.js` has a bug — `io` is used before it's defined. If the server won't start, you need to declare `const io = require("socket.io")(server);` before the `io.on(...)` call. This is on my "to fix" list (see below).
-
 ### 2. Frontend
 
 ```bash
@@ -235,7 +233,7 @@ Without this service running, everything works **except** the image search — t
 
 Full walkthrough (signup → browse → image search → checkout → email bill):
 
-**[🎥 Watch the demo]([ADD_YOUR_YOUTUBE_LINK_HERE](https://onedrive.live.com/?qt=allmyphotos&photosData=%2Fshare%2FCA524006C0AC4FC8%21s68b1fea510e5405a97537d9fe6745ec8%3Fithint%3Dvideo%26e%3DrEvwAF%26migratedtospo%3Dtrue&cid=CA524006C0AC4FC8&id=CA524006C0AC4FC8%21s68b1fea510e5405a97537d9fe6745ec8&redeem=aHR0cHM6Ly8xZHJ2Lm1zL3YvYy9jYTUyNDAwNmMwYWM0ZmM4L0VhWC1zV2psRUZwQWwxTjluLVowWHNnQnBpQ2NORXlxYlFCUndJZkppcmRlQmc%5FZT1yRXZ3QUY&v=photos))**
+[🎥 Watch the demo](https://onedrive.live.com/?qt=allmyphotos&photosData=%2Fshare%2FCA524006C0AC4FC8%21s68b1fea510e5405a97537d9fe6745ec8%3Fithint%3Dvideo%26e%3DrEvwAF%26migratedtospo%3Dtrue&cid=CA524006C0AC4FC8&id=CA524006C0AC4FC8%21s68b1fea510e5405a97537d9fe6745ec8&redeem=aHR0cHM6Ly8xZHJ2Lm1zL3YvYy9jYTUyNDAwNmMwYWM0ZmM4L0VhWC1zV2psRUZwQWwxTjluLVowWHNnQnBpQ2NORXlxYlFCUndJZkppcmRlQmc%5FZT1yRXZ3QUY&v=photos)
 
 ---
 
@@ -278,7 +276,7 @@ I build things end-to-end: React on the front, Node on the back, Python when the
 - 🐙 **GitHub:** [@sami000khaleel](https://github.com/sami000khaleel)
 - 📍 **Location:** Jülich, NRW
 
-**[🎥 Watch the demo]([ADD_YOUR_YOUTUBE_LINK_HERE](https://onedrive.live.com/?qt=allmyphotos&photosData=%2Fshare%2FCA524006C0AC4FC8%21s68b1fea510e5405a97537d9fe6745ec8%3Fithint%3Dvideo%26e%3DrEvwAF%26migratedtospo%3Dtrue&cid=CA524006C0AC4FC8&id=CA524006C0AC4FC8%21s68b1fea510e5405a97537d9fe6745ec8&redeem=aHR0cHM6Ly8xZHJ2Lm1zL3YvYy9jYTUyNDAwNmMwYWM0ZmM4L0VhWC1zV2psRUZwQWwxTjluLVowWHNnQnBpQ2NORXlxYlFCUndJZkppcmRlQmc%5FZT1yRXZ3QUY&v=photos))**
+[🎥 Watch the demo](https://onedrive.live.com/?qt=allmyphotos&photosData=%2Fshare%2FCA524006C0AC4FC8%21s68b1fea510e5405a97537d9fe6745ec8%3Fithint%3Dvideo%26e%3DrEvwAF%26migratedtospo%3Dtrue&cid=CA524006C0AC4FC8&id=CA524006C0AC4FC8%21s68b1fea510e5405a97537d9fe6745ec8&redeem=aHR0cHM6Ly8xZHJ2Lm1zL3YvYy9jYTUyNDAwNmMwYWM0ZmM4L0VhWC1zV2psRUZwQWwxTjluLVowWHNnQnBpQ2NORXlxYlFCUndJZkppcmRlQmc%5FZT1yRXZ3QUY&v=photos)
 
 ---
 
