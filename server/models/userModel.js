@@ -33,10 +33,10 @@ const userSchema = new mongoose.Schema({
   paymentInformation: {
     type: String,
   },
-  invoices: [
+  bills: [
     {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "Invoice",
+      ref: "Bill",
     },
   ],
   verificationCodes: [

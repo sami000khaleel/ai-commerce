@@ -97,20 +97,20 @@ const FilterForm = ({ filterQuery, setFilterQuery, setFilterFlag  }) => {
         </button>
         <h1>price range $</h1>
         <input
-          className="focus-visible:bg-white bg-[rgb(238,238,238)] p-1"
-          placeholder="max price"
-          type="number"
-          onChange={handleChangeMax}
-          name="max"
-          id="max"
-        />
-        <input
           type="number"
           className="bg-[rgb(238,238,238)] p-1 focus-visible:bg-white"
           placeholder="min price"
           onChange={handleChangeMin}
           name="min"
           id="min"
+        />
+        <input
+          className="focus-visible:bg-white bg-[rgb(238,238,238)] p-1"
+          placeholder="max price"
+          type="number"
+          onChange={handleChangeMax}
+          name="max"
+          id="max"
         />
       </span>
       <span className="relative" id="category">

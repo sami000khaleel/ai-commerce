@@ -44,4 +44,22 @@
     border-top-color: orange;
     animation: loading 1s linear infinite;
   }
-  
+  main {
+    overflow: hidden;
+}
+
+main::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('./assets//images//photo_2024-07-26_09-41-02.jpg');
+    background-size: cover;
+    background-position: center center;
+    background-repeat: no-repeat;
+    filter:opacity(0.2);
+
+    z-index: -1;
+}

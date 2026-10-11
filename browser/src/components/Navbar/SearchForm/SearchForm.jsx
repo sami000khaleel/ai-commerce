@@ -4,6 +4,7 @@ import api from '../../../api/api'
 import {useOutletContext, useNavigate } from 'react-router-dom'
 import FilterForm from '../../From/FilterForm/FilterForm'
 import ModalPopup from '../../ModalPopup/ModalPopup'
+import Cookies from 'js-cookies'
 const SearchForm = ({setProducts,setModalState,setDrawerMenuFlag}) => {
   const navigate=useNavigate()
   const [searchQuery,setSearchQuery]=useState('')
@@ -13,9 +14,14 @@ const SearchForm = ({setProducts,setModalState,setDrawerMenuFlag}) => {
   async function handleSearch(e){
     e.preventDefault()
     e.stopPropagation()
+    if(!Cookies.getItem('token')){
+      navigate('/home')
+      setModalState({message:'you need to have an account first',status:403,errorFlag:true,hideFlag:false})
+      return
+    }
     try{
       setLoadingFlag(true)
-      const response=await api.getProducts(searchQuery,filterQuery.category,filterQuery.price.max,filterQuery.price.min)
+      const response=await api.getProducts(searchQuery,filterQuery.category,filterQuery.price.min,filterQuery.price.max)
       setProducts(response.data.products)
       setLoadingFlag(false)
       setFilterFlag(false)

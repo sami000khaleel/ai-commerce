@@ -2,24 +2,11 @@ const mongoose = require("mongoose");
 
 const productSchema = new mongoose.Schema({
   publisherId: { type: mongoose.SchemaTypes.ObjectId, ref: "User" },
-  reviews: [
-    {
-      userId: { type: mongoose.SchemaTypes.ObjectId, ref: "User" },
-      comment: {
-        required: true,
-        type: String,
-      },
-      rating: {
-        type: Number,
-        required: true,
-      },
-    },
-  ],
   name: {
     type: String,
     required: true,
   },
-  previousPrice:Number,
+  previousPrice: Number,
   price: {
     type: Number,
     required: true,
@@ -49,7 +36,7 @@ const productSchema = new mongoose.Schema({
       "Hoodie",
       "Skip",
       "Blazer",
-      "Skirt"
+      "Skirt",
     ],
   },
   imagesNames: [

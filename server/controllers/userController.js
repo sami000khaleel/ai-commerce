@@ -4,26 +4,31 @@ const authentication = require("../middlewares/authentication.js");
 const userMiddleware = require("../middlewares/userMiddleware.js");
 const { throwError, handleError } = require("../errorHandler.js");
 const fs = require("fs");
-const billMiddleware=require('../middlewares/billMiddleware.js')
+const billMiddleware = require("../middlewares/billMiddleware.js");
 const { promisify } = require("util");
 const productMiddleware = require("../middlewares/productMiddleware.js");
+const bcryptjs = require("bcryptjs");
 const readFile = promisify(fs.readFile);
 class userController {
   constructor() {}
-  static async resetPassword(req,res){
-    try{
-      const {userId}=await authentication.validateToken(req.headers['token'])
-      let user=await User.findById(userId).catch(err=>throwError('no user was found',404))
-      const {password}=req.body
-      if(!password)
-        throwError('no password was sent',400)
-        if(password.length<6)
-          throwError('password should be at least 6 character long',400)
-        password=await authentication.hashPassword(password)
-        user.password=password
-        return res.json({success:true})
-    }catch(err){
-      handleError(err,res)
+  static async resetPassword(req, res) {
+    try {
+      const { userId } = await authentication.validateToken(
+        req.headers["token"]
+      );
+      let user = await User.findById(userId).catch((err) =>
+        throwError("no user was found", 404)
+      );
+      const { password } = req.body;
+      if (!password) throwError("no password was sent", 400);
+      if (password.length < 6)
+        throwError("password should be at least 6 character long", 400);
+      password = await bcryptjs.hash(password, 10);
+      user.password = password;
+      await user.save();
+      return res.json({ success: true });
+    } catch (err) {
+      handleError(err, res);
     }
   }
   static async getCountries(req, res) {
@@ -37,18 +42,25 @@ class userController {
     }
   }
   static async buyProduct(req, res) {
-    try
-     {
+    try {
       // check for products
       // cart:{products:{},userId,q}
-      const {userId}=await authentication.validateToken(req.headers['token'])
-      const user=await User.findById(userId)
-      let cart=req.body.map(item=>({productId:item.product._id,quantity:item.quantity,size:item.size}))
-      let bill=await billMiddleware.createBill(cart,userId)
-      const updatedPorducts=await productMiddleware.checkProductsQuantities(bill)
-      await bill.save()
-      await billMiddleware.sendBillEmail(bill,user)
-      return res.json({success:true,bill})
+      const { userId } = await authentication.validateToken(
+        req.headers["token"]
+      );
+      const user = await User.findById(userId);
+      let cart = req.body.map((item) => ({
+        productId: item.product._id,
+        quantity: item.quantity,
+        size: item.size,
+      }));
+      let bill = await billMiddleware.createBill(cart, userId);
+      const updatedPorducts = await productMiddleware.checkProductsQuantities(
+        bill
+      );
+      await bill.save();
+      await billMiddleware.sendBillEmail(bill, user);
+      return res.json({ success: true, bill });
     } catch (err) {
       handleError(err, res);
     }
@@ -147,25 +159,13 @@ class userController {
       await authentication.checkCodeAge(req.headers["code"], user);
       await authentication.checkIfCodeMatches(req.headers["code"], user);
       const token = authentication.createToken(user.id);
-      res.json({ success: true,token });
+      res.json({ success: true, token });
     } catch (error) {
       console.log(error);
       res.status(400).json({ success: false, message: error });
     }
   }
-  static async resetPassword(req, res) {
-    try {
-      if(!req.body?.password)
-        throwError('no password was given')
-      const { userId } = await authentication.validateToken(req.headers.token);
-      const user = await User.findById(userId);
-      const hashedPassword = await authentication.hashPassword(req.body.password, user);
-      user.password=hashedPassword
-      res.json({ success: true });
-    } catch (error) {
-      handleError(error,res)
-    }
-  }
+
   static async createVerificationCode(req, res) {
     try {
       const user = await userMiddleware.findUserByEmail(req.query.email);
@@ -178,34 +178,49 @@ class userController {
       });
     } catch (error) {
       console.error(error);
-      handleError(error,res)
-    }}
+      handleError(error, res);
+    }
+  }
   static async loginUser(req, res) {
     try {
       let result = null;
       if (!req.query?.email || !req.headers?.password)
-        return res.status(400).json({ success: false, message: 'You need to send your email and password' });
-  
+        return res
+          .status(400)
+          .json({
+            success: false,
+            message: "You need to send your email and password",
+          });
+
       const user = await userMiddleware.findUserByEmail(req.query.email);
       if (!user)
-        return res.status(404).json({ success: false, message: 'Email is incorrect' });
-  
-      result = await authentication.verifyPassword(req.headers["password"], user.password);
+        return res
+          .status(404)
+          .json({ success: false, message: "Email is incorrect" });
+
+      result = await authentication.verifyPassword(
+        req.headers["password"],
+        user.password
+      );
       if (!result)
-        return res.status(400).json({ success: false, message: 'Password is incorrect' });
-  
+        return res
+          .status(400)
+          .json({ success: false, message: "Password is incorrect" });
+
       const token = authentication.createToken(user.id);
       if (!token)
-        return res.status(400).json({ success: false, message: 'Failed creating the token' });
-  
+        return res
+          .status(400)
+          .json({ success: false, message: "Failed creating the token" });
+
       // Exclude unnecessary fields from the user object
       const sanitizedUser = {
         _id: user._id,
         name: user.name,
         email: user.email,
-        location: user.location // If you want to include the location field
+        location: user.location, // If you want to include the location field
       };
-  
+
       res.header("token", token);
       return res.json({ success: true, user: sanitizedUser });
     } catch (error) {
@@ -213,39 +228,43 @@ class userController {
       return res.status(500).json({ success: false, message: error.message });
     }
   }
-  
-  static async createAccount(req, res) {
-  try{  let result = null;
-    console.log(req.body);
-    await authentication.validateUserInfo(req.body.user);
-    const hashedPassword = await authentication.hashPassword(
-      req.headers.password,
-      req.body.user
-    );
-    req.body.user.password = hashedPassword;
-    result = await authentication.checkEmailExists(req.body.user.email);
-    if (result)
-      return res.status(400).json({ success: false, message: "email is already taken" });
-    const user = await userMiddleware.createUser(req.body.user);
-    const token = await authentication.createToken(user.id);
-    res.header("token", token);
-    const sanitizedUser = {
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      location: user.location // If you want to include the location field
-    };
 
-    
-    return res.json({ success: true, user:sanitizedUser });}
-    catch(err){
-      handleError(err,res)
+  static async createAccount(req, res) {
+    try {
+      let result = null;
+      console.log(req.body);
+      await authentication.validateUserInfo(req.body.user);
+      const hashedPassword = await authentication.hashPassword(
+        req.headers.password,
+        req.body.user
+      );
+      req.body.user.password = hashedPassword;
+      result = await authentication.checkEmailExists(req.body.user.email);
+      if (result)
+        return res
+          .status(400)
+          .json({ success: false, message: "email is already taken" });
+      const user = await userMiddleware.createUser(req.body.user);
+      const token = await authentication.createToken(user.id);
+      res.header("token", token);
+      const sanitizedUser = {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        location: user.location, // If you want to include the location field
+      };
+
+      return res.json({ success: true, user: sanitizedUser });
+    } catch (err) {
+      handleError(err, res);
     }
   }
   static async validateToken(req, res) {
     try {
       if (!req.headers["token"])
-        return res.status(400).json({ success: false, message: "no token was sent" });
+        return res
+          .status(400)
+          .json({ success: false, message: "no token was sent" });
       const token = await authentication.validateToken(req.headers["token"]);
       return res.json({ success: true });
     } catch (error) {

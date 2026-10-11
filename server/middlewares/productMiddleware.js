@@ -42,7 +42,6 @@ class productMiddleware {
     products = products.map((element) => ({
       _id: element.product._id,
       publisherId: element.product.publisherId,
-      reviews: element.product.reviews,
       name: element.product.name,
       price: element.product.price,
       description: element.product.description,
@@ -218,7 +217,6 @@ class productMiddleware {
     try {
       // Check if all required fields are present
       const requiredFields = [
-        "attributes",
         "name",
         "price",
         "description",

@@ -2,6 +2,7 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import App from "./App";
+import PageNotFound from './Pages/PageNotFound '
 import { CartPage, Home, Login, Signup, Product } from "./Pages";
 import Signout from "./Pages/Signout";
 import RecoverAccount from "./Pages/RecoverAccount";
@@ -46,6 +47,10 @@ const router = createBrowserRouter([
       },
     ],
   },
+  {
+    path:'*',
+    element:<PageNotFound/>
+  }
 ]);
 
 createRoot(document.getElementById("root")).render(

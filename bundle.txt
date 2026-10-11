@@ -1,0 +1,2204 @@
+browser\postcss.config.js
+export default {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}
+
+--------new file--------
+browser\src\Pages\index.js
+import Home from "./Home";
+import CartPage from "./CartPage";
+import Login from "./Login";
+import Product from "./Product";
+import Signup from "./Signup";
+export {Home,CartPage,Login,Product,Signup}
+--------new file--------
+browser\src\api\api.js
+import axios from "axios";
+import Cookies from "js-cookies";
+
+export default class api {
+  static url = "http://127.0.0.1:3000/api";
+  static token = Cookies.getItem("token");
+
+  static async getRandomProducts(batch) {
+    try {
+      const response = await axios.get(
+        `${api.url}/product/get-random-products?batch=${batch}`,
+        {
+          headers: {
+            token: Cookies.getItem("token"),
+          },
+        }
+      );
+      return response;
+    } catch (error) {
+      console.error("Error fetching random products:", error);
+      throw error;
+    }
+  }
+
+  static async searchByImage(imageFile) {
+    try {
+      const formData = new FormData();
+      formData.append("file", imageFile);
+
+      const response = await axios.post(
+        `${api.url}/product/search-by-image`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            token: Cookies.getItem("token"),
+          },
+        }
+      );
+      return response;
+    } catch (error) {
+      console.error("Error searching by image:", error);
+      throw error;
+    }
+  }
+
+  static async getSimilarities(imageFile) {
+    try {
+      const formData = new FormData();
+      formData.append("file", imageFile);
+
+      const response = await axios.post(
+        `${api.url}/models/get-similarities`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            token: Cookies.getItem("token"),
+          },
+        }
+      );
+      return response;
+    } catch (error) {
+      console.error("Error getting similarities:", error);
+      throw error;
+    }
+  }
+
+  static async getImage(productId, imageName) {
+    try {
+      const response = await axios.get(
+        `${api.url}/product/get-image?productId=${productId}&imageName=${imageName}`,
+        {
+          headers: {
+            token: Cookies.getItem("token"),
+          },
+        }
+      );
+      return response;
+    } catch (error) {
+      console.error("Error getting image:", error);
+      throw error;
+    }
+  }
+
+  static async deleteProduct(productId) {
+    try {
+      const response = await axios.delete(`${api.url}/product`, {
+        headers: {
+          token: Cookies.getItem("token"),
+        },
+        data: {
+          productId: productId,
+        },
+      });
+      return response;
+    } catch (error) {
+      console.error("Error deleting product:", error);
+      throw error;
+    }
+  }
+
+  static async getProducts(search, category, min = "", max = "") {
+    try {
+      const response = await axios.get(`${api.url}/product`, {
+        params: {
+          search,
+          category: category,
+          min: min,
+          max: max,
+        },
+        headers: {
+          token: Cookies.getItem("token"),
+        },
+      });
+      return response;
+    } catch (error) {
+      console.error("Error getting products:", error);
+      throw error;
+    }
+  }
+
+  static async getProduct(productId) {
+    try {
+      const response = await axios.get(`${api.url}/product/${productId}`, {
+        headers: {
+          token: Cookies.getItem("token"),
+        },
+      });
+      return response;
+    } catch (error) {
+      console.error("Error getting product:", error);
+      throw error;
+    }
+  }
+
+  static async updateProduct(productData) {
+    try {
+      const response = await axios.patch(`${api.url}/product`, productData, {
+        headers: {
+          "Content-Type": "application/json",
+          token: Cookies.getItem("token"),
+        },
+      });
+      return response;
+    } catch (error) {
+      console.error("Error updating product:", error);
+      throw error;
+    }
+  }
+
+  static async createProduct(productData) {
+    try {
+      const response = await axios.post(`${api.url}/product`, productData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          token: Cookies.getItem("token"),
+        },
+      });
+      return response;
+    } catch (error) {
+      console.error("Error creating product:", error.response);
+      throw error;
+    }
+  }
+
+  static async buyProducts(cart) {
+    try {
+      const response = await axios.post(`${api.url}/user/buy`, cart, {
+        headers: {
+          "Content-Type": "application/json",
+          token: Cookies.getItem("token"),
+        },
+      });
+      console.log(Cookies.getItem("token"));
+      return response;
+    } catch (error) {
+      console.error("Error buying products:", error);
+      throw error;
+    }
+  }
+
+  static async getAdmins() {
+    try {
+      const response = await axios.get(`${api.url}/user/get-admins`, {
+        headers: {
+          token: Cookies.getItem("token"),
+        },
+      });
+      return response;
+    } catch (error) {
+      console.error("Error getting admins:", error);
+      throw error;
+    }
+  }
+
+  static async toggleAdmin(userId) {
+    try {
+      const response = await axios.patch(
+        `${api.url}/user/toggle-admin`,
+        { userId: userId },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            token: Cookies.getItem("token"),
+          },
+        }
+      );
+      return response;
+    } catch (error) {
+      console.error("Error toggling admin:", error);
+      throw error;
+    }
+  }
+  static async verifyCode(email, code) {
+    console.log(email, code);
+    try {
+      const response = await axios.post(
+        `${api.url}/user/recover-account`,
+        { email },
+        {
+          headers: {
+            token: api.token,
+            code: String(code),
+          },
+        }
+      );
+      return response;
+    } catch (err) {
+      console.error("error verifying the code : ", err);
+      throw err;
+    }
+  }
+
+  static async getCode(email) {
+    try {
+      const response = await axios.get(
+        `${api.url}/user/recover-account?email=${email}`
+      );
+      return response;
+    } catch (err) {
+      console.error("error getting the code : ", err);
+      throw err;
+    }
+  }
+  static async login(email, password) {
+    try {
+      const response = await axios.get(`${api.url}/user/login?email=${email}`, {
+        headers: {
+          password,
+        },
+      });
+      return response;
+    } catch (err) {
+      console.error("error logging in : ", err);
+      throw err;
+    }
+  }
+  static async validateToken() {
+    try {
+      const response = await axios.get(`${api.url}/user/validate-token`, {
+        headers: {
+          token: Cookies.getItem("token"),
+        },
+      });
+      return response;
+    } catch (err) {
+      console.error("error validating token : ", err);
+      throw err;
+    }
+  }
+  static async createAccount(user) {
+    try {
+      const response = await axios.post(`${api.url}/user/`, {
+        user,
+      });
+      return response;
+    } catch (err) {
+      console.error("error creating you`r account : ", err);
+      throw err;
+    }
+  }
+  static async getCountries() {
+    try {
+      const response = await axios.get(`${api.url}/user/get-countries`, {
+        headers: {
+          token: Cookies.getItem("token"),
+        },
+      });
+      return response;
+    } catch (error) {
+      console.error("Error getting countries:", error);
+      throw error;
+    }
+  }
+
+  static async getCities(country) {
+    try {
+      const response = await axios.get(
+        `${api.url}/user/get-cities?country=${country}`,
+        {
+          headers: {
+            token: Cookies.getItem("token"),
+          },
+        }
+      );
+      return response;
+    } catch (error) {
+      console.error("Error getting cities:", error);
+      throw error;
+    }
+  }
+
+  static async resetPassword(password) {
+    try {
+      const response = await axios.patch(
+        `${api.url}/user/reset-password`,
+        { password },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            token: Cookies.token,
+          },
+        }
+      );
+      return response;
+    } catch (error) {
+      console.error("Error resetting password:", error);
+      throw error;
+    }
+  }
+}
+
+--------new file--------
+browser\tailwind.config.js
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+--------new file--------
+browser\vite.config.js
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [react()],
+})
+
+--------new file--------
+bundle.js
+// bundle.js
+const fs = require('fs');
+const path = require('path');
+
+const bundleFiles = ["*.js"];
+const noBundleDir = ["node_modules", "images", "uploads","scripts"];
+
+// Simple pattern matcher for "*.ext" and exact filenames
+function matchesPattern(filename, patterns) {
+  return patterns.some(pattern => {
+    if (pattern.startsWith('*.')) {
+      return filename.endsWith(pattern.slice(1));
+    }
+    return filename === pattern;
+  });
+}
+
+// Track whether any ancestor directory is in noBundleDir
+function isInNoBundleDir(relPath) {
+  const parts = relPath.split(path.sep);
+  // Check all directory segments (exclude the filename itself)
+  return parts.slice(0, -1).some(seg => noBundleDir.includes(seg));
+}
+
+function walk(dir, rootDir, results = []) {
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    const relPath = path.relative(rootDir, fullPath);
+
+    if (entry.isDirectory()) {
+      // Recurse into every directory — noBundleDir just filters files inside
+      walk(fullPath, rootDir, results);
+    } else if (entry.isFile()) {
+      if (isInNoBundleDir(relPath)) continue;         // skip files inside noBundleDir
+      if (!matchesPattern(entry.name, bundleFiles)) continue;
+      results.push(relPath);
+    }
+  }
+  return results;
+}
+
+function bundle(rootDir, outputFile = 'bundle.txt') {
+  const files = walk(rootDir, rootDir);
+  files.sort();
+
+  let output = '';
+  for (const relPath of files) {
+    const code = fs.readFileSync(path.join(rootDir, relPath), 'utf8');
+    output += `${relPath}\n${code}\n--------new file--------\n`;
+  }
+
+  fs.writeFileSync(outputFile, output, 'utf8');
+  console.log(`Bundled ${files.length} files into ${outputFile}`);
+}
+
+const rootDir = process.argv[2] || process.cwd();
+const outputFile = process.argv[3] || 'bundle.txt';
+bundle(rootDir, outputFile);
+--------new file--------
+server\controllers\billController.js
+class billController{
+    constructor(){
+
+    }
+}
+module.exports=billController
+--------new file--------
+server\controllers\productController.js
+const Product = require("../models/productModel");
+const productMiddleware = require("../middlewares/productMiddleware");
+const User = require("../models/userModel");
+const mongoose = require("mongoose");
+const fs = require("fs");
+const formData = require("form-data");
+const multer = require("multer");
+const billMiddlware = require("../middlewares/billMiddleware");
+const authentication = require("../middlewares/authentication");
+const userMiddleware = require("../middlewares/userMiddleware");
+const { handleError, throwError } = require("../errorHandler");
+const { promisify } = require("util");
+const access = promisify(fs.access);
+const writeFile=promisify(fs.writeFile)
+const readFile=promisify(fs.readFile)
+const mkdir=promisify(fs.mkdir)
+const rename=promisify(fs.rename)
+const path = require("path");
+class productController {
+  static async getRandomProducts(req, res) {
+    try {
+      await authentication.validateToken(req.headers["token"]);
+      if (!req.query?.batch) throwError("do not try to hack", 404);
+      const batch = req.query.batch;
+      const products = await productMiddleware.getRandomProducts(batch);
+      return res.json({ success: true, products });
+    } catch (err) {
+      handleError(err, res);
+    }
+  }
+  static async searchByImage(req, res) {
+    try {
+      const { userId } = await authentication.validateToken(
+        req.headers["token"]
+      );
+      const uploadDir = path.join(__dirname, "..", "uploads");
+
+      // Check if the uploads directory exists, create it if it doesn't
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+
+      const storage = multer.diskStorage({
+        destination: function (req, file, cb) {
+          cb(null, uploadDir); // Destination folder for uploaded files
+        },
+        filename: function (req, file, cb) {
+          cb(null, Date.now() + path.extname(file.originalname)); // Rename files to avoid collisions
+        },
+      });
+
+      const upload = multer({ storage }).single("file");
+
+      upload(req, res, async (err) => {
+        if (err) {
+          console.error("Error uploading file:", err);
+          return res.status(500).send("Internal Server Error");
+        }
+
+        // File is uploaded, you can access it via req.file
+        const filePath = req.file.path;
+        console.log("File saved at:", filePath);
+        let similarities = await productMiddleware.sendFile(filePath);
+        // Respond with a success message
+        console.log(similarities);
+        similarities = productMiddleware.extractImagesNames(similarities);
+        const results = await productMiddleware.matchProductsByImages(
+          similarities
+        );
+        console.log("done");
+        return res.json(results); // Assuming places is defined elsewhere in your code
+      });
+    } catch (err) {
+      console.log(err);
+      handleError(err, res);
+    }
+  }
+  static async buyProduct(req, res) {
+    try {
+      const token = await authentication.validateToken(req.headers["token"]);
+      const user = await User.findById(token.userId);
+      const sentProducts = req.body.products;
+      let products = [];
+      for (let sentProduct of sentProducts) {
+        let product = await Product.findById(sentProduct.productId);
+        await productMiddleware.checkForQuantity(
+          product,
+          sentProduct.quantities
+        );
+        product = productMiddleware.subtractQuantities(
+          product,
+          sentProduct.quantities
+        );
+        product.purchasedQuantities = sentProduct.quantities;
+        products.push(product);
+      }
+      user = userMiddleware.addPurchasedProducts(user, products);
+      let bill = await billMiddlware.createBill(products, user);
+      bill.totalPrice = billMiddlware.calculateTotalPrice(bill, products);
+      return res.json({ success: true, bill });
+    } catch (err) {
+      handleError(err, res);
+    }
+  }
+  static async deleteProduct(req, res) {
+    try {
+      const token = await authentication.validateToken(req.headers["token"]);
+      const user = await User.findById(token.userId);
+      if (user.role !== "admin" || user.role !== "manager")
+        throwError("you do not have authority lol", 403);
+      if (!req.query?.productId)
+        return res
+          .status(400)
+          .json({ success: false, message: "no id was provided" });
+      const { productId } = req.query;
+      const product = await Product.findById(productId);
+      if (!product) return throwError("no product was found", 404);
+      product.quantity = 0;
+      await product.save();
+      return res.json({ success: true });
+    } catch (err) {
+      handleError(err, res);
+    }
+  }
+  static async getImage(req, res) {
+    try {
+      if (!req.query?.imageName || !req.query?.productId)
+        return throwError("missing parameters", 400);
+      const { imageName, productId } = req.query;
+      const imagePath = path.join(
+        __dirname,
+        "..",
+        "data",
+        productId,
+        imageName
+      );
+      await access(imagePath).catch((err) =>
+        throwError(`image was found`, 404)
+      );
+      return res.sendFile(imagePath);
+    } catch (err) {
+      handleError(err, res);
+    }
+  }
+  static async getProducts(req, res) {
+    try {
+      if (!Object.keys(req.query).some((el) => (req.query[el] ? true : false)))
+        throwError("specify what you are looking for", 400);
+      // const batchSize = 10;
+      // let skipCount = 0;
+      // const { batch } = req.query;
+      // if (batch > 1) {
+      //   skipCount = (batch - 1) * batchSize;
+      // }
+      const conditions = productMiddleware.makeConditions(
+        req.query?.category,
+        req.query?.max,
+        req.query?.min
+      );
+      let query = {};
+
+      const searchQuery = req.query.search;
+
+      let regex;
+
+      if (searchQuery) {
+        const escapedSearchQuery = searchQuery.replace(
+          /[-[\]{}()*+?.,\\^$|#\s]/g,
+          "\\$&"
+        );
+        regex = new RegExp(escapedSearchQuery, "gi");
+      }
+      let results = [];
+      // Include the search query conditions if it exists
+      if (searchQuery) {
+        query.$or = [
+          { name: regex },
+          { name: { $regex: regex } },
+          { name: { $regex: searchQuery } },
+          { description: regex },
+          { description: { $regex: regex } },
+          { description: { $regex: searchQuery } },
+        ];
+      }
+      // Perform the search using the constructed query
+      // Filter out duplicate places
+      console.log(results.length);
+      const uniqueResults = {};
+      console.log(req.query)
+      const products = await Product.find({ $and: [conditions, query, {}] })
+        .limit(20)
+        .sort({ createdAt: -1 }) // Sort by createdAt field in descending order (newest to oldest)
+
+      if (!products.length) return throwError("no products were found ", 404);
+      products.forEach((product) => {
+        if (!uniqueResults[product._id]) {
+          uniqueResults[product._id] = product;
+        }
+      });
+      return res.json({ length: products.length, success: true, products });
+    } catch (err) {
+      handleError(err, res);
+    }
+  }
+
+  static async getProduct(req, res) {
+    try {
+      const token = await authentication.validateToken(req.headers["token"]);
+      const { productId } = req.params;
+      if (!productId) throwError("no product Id was provided", 404);
+      const product = await Product.findById(productId);
+      if (!product) throwError("no prduct was found", 404);
+      return res.status(200).json({ success: true, product });
+    } catch (err) {
+      handleError(err, res);
+    }
+  }
+  static async updateProduct(req, res) {
+    try {
+      const token = await authentication.validateToken(req.headers["token"]);
+
+      const user = await User.findById(token.userId);
+      if (!user) throwError("no user was found !", 404);
+      if (user.role !== "admin" || user.role !== "manager")
+        throwError("you do not have authority lol", 403);
+      const product = await Product.findById(req.body.productId);
+      product = await productMiddleware.updateProduct(req.query, product);
+      if (req.query.deleteImages.length)
+        product = await productMiddleware.deleteImages(product);
+      await product.save();
+      if (!req.query.addImages.length)
+        return res.status(201).json({ success: true, product });
+      const imagespaths = await productMiddleware.generateImagesPath(
+        req.files,
+        productId
+      );
+      product = await productMiddleware.saveImages(imagespaths, req.files);
+      await product.save();
+      return res.status(201).json({ success: true, product });
+    } catch (err) {
+      handleError(err, res);
+    }
+  }
+  static async createProduct(req, res) {
+    try {
+      req.imagesNames = [];
+      await   productController.deleteAllFiles(path.join('./temp')) 
+      const {userId}=await authentication.validateToken(req.headers['token'])
+      const user=await User.findById(userId)
+      if(user.role!=='admin' && user.role!=='manager')
+          throwError('you are niether an admin or a manager',403)
+        const storage = multer.diskStorage({
+          destination:  function (req, file, cb) {
+            cb(null, path.join('./','temp')); // Specify a dedicated upload folder
+          },
+          filename:async function (req, file, cb) {
+            
+            const imageName = Date.now() + path.extname(file.originalname);
+            req.imagesNames.push(imageName)
+            cb(null, imageName);
+          },
+        });
+        const upload = multer({ storage }).array("files");
+        
+        // Handle the upload asynchronously (if needed)
+        await upload(req, res, async (err) => {
+          if (err) {
+            console.error("Error uploading file:", err);
+            throwError('error uploading the files',500)
+          }
+          const productData=JSON.parse(req.body.product)
+          // console.log(productData)
+          const newProduct=new Product({... productData})
+          newProduct.quantities=productData.quantities
+          newProduct.imagesNames=req.imagesNames
+          await productController.moveFiles(newProduct.id)
+          // await newProduct.save()
+          return res.json({ success: true,newProduct }); // Include uploaded files info in response
+        });
+        
+    } catch (err) {
+      handleError(err, res);
+    }
+  }
+  static async  moveFiles(productId) {
+    const destinationDir = path.join('./s', productId); // Create directory based on product ID
+    await fs.promises.mkdir(destinationDir, { recursive: true }); // Ensure directory exists
+    const filesNames= await fs.promises.readdir(path.join('./','temp'))
+    for (const fileName of filesNames) {
+      const finalPath = path.join(destinationDir, fileName);
+      await fs.promises.rename(path.join('./','temp',fileName), finalPath); // Move each file
+    }
+  }
+  static async  deleteAllFiles(directoryPath) {
+  const files = await fs.promises.readdir(directoryPath); // List files asynchronously
+
+  for (const file of files) {
+    const filePath = path.join(directoryPath, file);
+    await fs.promises.unlink(filePath); // Delete each file asynchronously
+  }
+}
+}
+module.exports = productController;
+
+--------new file--------
+server\controllers\userController.js
+const jwt = require("jsonwebtoken");
+const User = require("../models/userModel.js");
+const authentication = require("../middlewares/authentication.js");
+const userMiddleware = require("../middlewares/userMiddleware.js");
+const { throwError, handleError } = require("../errorHandler.js");
+const fs = require("fs");
+const billMiddleware = require("../middlewares/billMiddleware.js");
+const { promisify } = require("util");
+const productMiddleware = require("../middlewares/productMiddleware.js");
+const bcryptjs = require("bcryptjs");
+const readFile = promisify(fs.readFile);
+class userController {
+  constructor() {}
+  static async resetPassword(req, res) {
+    try {
+      const { userId } = await authentication.validateToken(
+        req.headers["token"]
+      );
+      let user = await User.findById(userId).catch((err) =>
+        throwError("no user was found", 404)
+      );
+      const { password } = req.body;
+      if (!password) throwError("no password was sent", 400);
+      if (password.length < 6)
+        throwError("password should be at least 6 character long", 400);
+      password = await bcryptjs.hash(password, 10);
+      user.password = password;
+      await user.save();
+      return res.json({ success: true });
+    } catch (err) {
+      handleError(err, res);
+    }
+  }
+  static async getCountries(req, res) {
+    try {
+      let file = await readFile("./countries_and_cities.json");
+      file = JSON.parse(file);
+      const countries = file.map((element) => element.country);
+      return res.json({ success: true, countries });
+    } catch (err) {
+      handleError(err, res);
+    }
+  }
+  static async buyProduct(req, res) {
+    try {
+      // check for products
+      // cart:{products:{},userId,q}
+      const { userId } = await authentication.validateToken(
+        req.headers["token"]
+      );
+      const user = await User.findById(userId);
+      let cart = req.body.map((item) => ({
+        productId: item.product._id,
+        quantity: item.quantity,
+        size: item.size,
+      }));
+      let bill = await billMiddleware.createBill(cart, userId);
+      const updatedPorducts = await productMiddleware.checkProductsQuantities(
+        bill
+      );
+      await bill.save();
+      await billMiddleware.sendBillEmail(bill, user);
+      return res.json({ success: true, bill });
+    } catch (err) {
+      handleError(err, res);
+    }
+  }
+  static async getCities(req, res) {
+    try {
+      if (!req.query?.country) throwError("no country was sent", 400);
+      let file = await readFile("./countries_and_cities.json");
+      file = JSON.parse(file);
+      const countryObj = file.filter(
+        (elem) => elem.country === req.query.country
+      );
+      return res.json({ success: true, cities: countryObj[0].cities });
+    } catch (err) {
+      handleError(err, res);
+    }
+  }
+  static async getAdmins(req, res) {
+    try {
+      await authentication.validateToken(req.headers["token"]);
+      let admins = await User.find({ role: "admin" });
+      admins = admins.map(({ _id, role, name, email }) => {
+        return { _id, role, name, email };
+      });
+      return res.json({ success: true, admins });
+    } catch (err) {
+      if (!err?.internal)
+        return res
+          .status(err.status)
+          .json({ success: false, message: err.message });
+      console.error(err);
+      return res
+        .status(500)
+        .json({ success: false, message: "internal server error" });
+    }
+  }
+  static async toggleAdmin(req, res) {
+    try {
+      let user = await User.findById(req.body.userId);
+      if (!user)
+        return res
+          .status(404)
+          .json({ success: false, message: "no user was found" });
+      const token = await authentication.validateToken(req.headers["token"]);
+      console.log(token);
+      if (token.userId !== process.env.MANAGER_ID)
+        return res
+          .status(403)
+          .json({ success: false, message: "you are not the manager" });
+
+      const manager = await User.findById(token.userId);
+      if (!manager)
+        return res
+          .status(404)
+          .json({ success: false, message: "no manager was found" });
+      user = await userMiddleware.toggleAdmin(user);
+      console.log("done");
+      return res.status(201).json({ success: true });
+    } catch (err) {
+      if (!err?.internal)
+        return res
+          .status(err.status)
+          .json({ success: false, message: err.message });
+      console.error(err);
+      return res
+        .status(500)
+        .json({ success: false, message: "internal server error" });
+    }
+  }
+  // is the beginning there is no manager
+  // manager is set using this function
+  // while there is a manager no other manager can be
+  // manager can log out henc other one can replace
+  static async login_admin(req, res) {
+    try {
+      const password = req.headers["password"];
+      if (!process.env.MANAGER_PASSWORD)
+        return res.status(400).json({
+          success: false,
+          error: "there is no password set in the environment",
+        });
+      if (password != process.env.MANAGER_PASSWORD)
+        return res.status(400).json({
+          success: false,
+          message: "the manager password is incorrect",
+        });
+      const manager = await userMiddleware.set_manager(req.headers["userId"]);
+    } catch (error) {
+      return res.status(400).json({ success: false, message: error.message });
+    }
+  }
+  static async checkVerificationAccount(req, res) {
+    try {
+      const user = await userMiddleware.findUserByEmail(req.body.email);
+      // if it is later than 30 seconds then deny
+      await authentication.checkCodeAge(req.headers["code"], user);
+      await authentication.checkIfCodeMatches(req.headers["code"], user);
+      const token = authentication.createToken(user.id);
+      res.json({ success: true, token });
+    } catch (error) {
+      console.log(error);
+      res.status(400).json({ success: false, message: error });
+    }
+  }
+
+  static async createVerificationCode(req, res) {
+    try {
+      const user = await userMiddleware.findUserByEmail(req.query.email);
+      await authentication.checkCodeFrequency(user);
+      const code = await authentication.createVerificationCode(user);
+      await authentication.sendCode(user.email, code);
+      return res.json({
+        success: true,
+        message: "your code has been sent successfully",
+      });
+    } catch (error) {
+      console.error(error);
+      handleError(error, res);
+    }
+  }
+  static async loginUser(req, res) {
+    try {
+      let result = null;
+      if (!req.query?.email || !req.headers?.password)
+        return res
+          .status(400)
+          .json({
+            success: false,
+            message: "You need to send your email and password",
+          });
+
+      const user = await userMiddleware.findUserByEmail(req.query.email);
+      if (!user)
+        return res
+          .status(404)
+          .json({ success: false, message: "Email is incorrect" });
+
+      result = await authentication.verifyPassword(
+        req.headers["password"],
+        user.password
+      );
+      if (!result)
+        return res
+          .status(400)
+          .json({ success: false, message: "Password is incorrect" });
+
+      const token = authentication.createToken(user.id);
+      if (!token)
+        return res
+          .status(400)
+          .json({ success: false, message: "Failed creating the token" });
+
+      // Exclude unnecessary fields from the user object
+      const sanitizedUser = {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        location: user.location, // If you want to include the location field
+      };
+
+      res.header("token", token);
+      return res.json({ success: true, user: sanitizedUser });
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({ success: false, message: error.message });
+    }
+  }
+
+  static async createAccount(req, res) {
+    try {
+      let result = null;
+      console.log(req.body);
+      await authentication.validateUserInfo(req.body.user);
+      const hashedPassword = await authentication.hashPassword(
+        req.headers.password,
+        req.body.user
+      );
+      req.body.user.password = hashedPassword;
+      result = await authentication.checkEmailExists(req.body.user.email);
+      if (result)
+        return res
+          .status(400)
+          .json({ success: false, message: "email is already taken" });
+      const user = await userMiddleware.createUser(req.body.user);
+      const token = await authentication.createToken(user.id);
+      res.header("token", token);
+      const sanitizedUser = {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        location: user.location, // If you want to include the location field
+      };
+
+      return res.json({ success: true, user: sanitizedUser });
+    } catch (err) {
+      handleError(err, res);
+    }
+  }
+  static async validateToken(req, res) {
+    try {
+      if (!req.headers["token"])
+        return res
+          .status(400)
+          .json({ success: false, message: "no token was sent" });
+      const token = await authentication.validateToken(req.headers["token"]);
+      return res.json({ success: true });
+    } catch (error) {
+      console.error(error);
+      return res.status(400).json({
+        success: false,
+        message: "the token is corrupted or expired",
+      });
+    }
+  }
+}
+module.exports = userController;
+
+--------new file--------
+server\errorHandler.js
+function handleError(err,res) { 
+    console.error(err)
+    if (err?.userError) 
+        // Client error
+        return  res.status(err?.status || 400).json({ message: err.message,success:false });
+    // Server error
+    return  res.status(500).json({ message: 'Internal Server Error',success:false });
+  }
+  function throwError(message,status){
+    let err = new Error(message);
+    err.userError = true;
+    err.status = status;
+    throw err; // This exits the function
+  }
+module.exports={handleError,throwError}
+
+--------new file--------
+server\index.js
+require("dotenv").config();
+const express = require("express");
+const path = require("path");
+const http = require("http");
+const mongoose = require("mongoose");
+const fs = require("fs");
+const app = express();
+const bodyparser = require("body-parser");
+const multer = require("multer");
+const server = http.createServer(app);
+const cors=require('cors')
+app.use(bodyparser.json());
+app.use(cors());
+app.use(bodyparser.urlencoded({ extended: true }));
+mongoose.connect('mongodb://127.0.0.1:27017/social-media').then(()=>{
+  console.log('connected to database')
+}).catch(err=>console.log(err.message))
+const socketHandler=require('./socketHandler')
+io.on('connection',(socket)=>{
+  socketHandler(socket)
+})
+server.listen(3000,()=>{
+  console.log('server is running')
+})
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+  // Perform some error handling or logging here
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection:', reason);
+  // Perform some error handling or logging here
+});
+app.use(express.static(path.join(__dirname,'./dist')))
+app.get('*',(req,res)=>{
+  res.sendFile(path.join(__dirname,'dist','imdex.html'))
+})
+--------new file--------
+server\middlewares\authentication.js
+const nodemailer = require('nodemailer');
+const User = require("../models/userModel.js");
+const axios = require("axios");
+const bcryptjs = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const { throwError } = require('../errorHandler.js');
+class authentication {
+  constructor() {}
+  static async createVerificationCode(user){
+    try
+    {
+      const code = Math.floor(Math.random()*1000000)
+      user.verificationCodes.push({code})
+      await user.save()
+      return code
+    }
+    catch(error){
+      console.log(error)
+      throw error
+    }
+  }
+  static async checkIfCodeMatches(code, user) {
+    try {
+      const lastVerificationCode = user.verificationCodes[user.verificationCodes.length - 1];
+  
+      if (!lastVerificationCode || lastVerificationCode.code != code) {
+        throw new Error( "Invalid verification code" );
+        
+      }
+  
+      return "Verification code matched successfully";
+    } catch (error) {
+      console.error(error,'a');
+      throw error
+    }
+  }
+  
+  static async checkCodeAge(code,user){
+    try
+    {
+     const timeGapSeconds=Date.now()-user.verificationCodes[user.verificationCodes.length-1].createdAt
+      if(timeGapSeconds<30000)
+        throw new Error(`you have to type the code within 30 seconds from recieving it.`)
+    }
+    catch(error){
+      console.log(error)
+      throw error
+    }
+  }
+  static async sendCode(email,code){
+    try{
+      console.log(process.env.UESR_NAME)
+      const transporter=nodemailer.createTransport({
+        service:'gmail',
+        auth:{
+        user:process.env.UESR_NAME,
+        pass:process.env.APP_PASSWORD
+      }
+    })
+    const mailOptions={
+      from:process.env.EMAIL,
+      to:email,
+      subject:'ai commerce account recovery',
+      text:`your verification code is : ${code}`
+    }
+    const info = await transporter.sendMail(mailOptions);
+    console.log('Email sent: ' + info.response);
+
+  }
+  
+  catch(error){
+    console.error(error)
+    throw error
+  }
+}
+  static async checkCodeFrequency(user) {
+    try {
+      if (!user.verificationCodes.length) return true;
+      let isAfter30Sec= Date.now() -
+        user.verificationCodes[user.verificationCodes.length - 1].createdAt >30000
+        
+        // if(!isAfter30Sec)
+        //   throw new Error({message:'you must wait 30 seconds between each code request'});
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+  static async verifyPassword(sentPassword, password) {
+    try {
+      const res = await bcryptjs.compare(sentPassword, password);
+      return res;
+    } catch (error) {
+      console.error(error);
+      throwError('incorrect password',400)
+    }
+  }
+  static createToken(userId) {
+    const token = jwt.sign({ userId }, process.env.JWT_SECRET, {
+    });
+    return token;
+  }
+  static async checkCityExists(city) {
+    try {
+      const response = await axios.get(
+        `https://api.example.com/cities?name=${city}`
+      );
+      const cities = response.data;
+
+      // Check if the city exists in the response
+      const cityExists = cities.some(
+        (c) => c.name.toLowerCase() === city.toLowerCase()
+      );
+
+      return cityExists;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+  static async checkEmailExists(email) {
+    try {
+      const existingUser = await User.findOne({ email });
+      return existingUser !== null;
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  static async hashPassword(password,user) {
+    try {
+      // Hash the password
+      const hashedPassword = await bcryptjs.hash(user.password, 10);
+      return hashedPassword;
+    } catch (error) {
+        throwError("error while dealing with you`r password")
+    }
+  }
+  static async validateUserInfo(user) {
+    try {
+      // Validate user information here
+      if (!user.name || !user.email || !user.password) {
+        let err= new Error("Missing required user information");
+        err.status=403
+        err.internal=false
+        throw err
+      }
+
+      // Validate password length
+      if (user.password.length < 6) {
+          return throwError('password should be at least 6 characters long',400)
+      }
+
+      // Return the validated user information with the hashed password
+      return {
+        name: user.name,
+        email: user.email,
+        password: user.password,
+      };
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+  static async validateToken(token) {
+      if(!token)
+        throwError('no token was provided',400)
+        const result = await jwt.verify(token, process.env.JWT_SECRET)
+      return result;
+    
+      
+  }
+}
+module.exports = authentication;
+
+--------new file--------
+server\middlewares\billMiddleware.js
+const { throwError } = require("../errorHandler");
+const Bill = require("../models/billModel");
+const Product = require("../models/productModel");
+const nodemailer = require('nodemailer');
+class billMiddlware {
+  static async createBill(cart, userId) {
+    let bill = {};
+    let totalPrice = 0;
+    bill.user = userId;
+    bill.products = []; // Initialize products array
+    for (let element of cart) {
+        const product = await Product.findById(element.productId);
+        if (!product) {
+            throw new Error('Product not found');
+        }
+        bill.products.push({
+            productId: product._id,
+            quantity: { size: element.size, quantity: element.quantity },
+            price: product.price * element.quantity,
+        });
+        totalPrice += product.price * element.quantity;
+    }
+    bill.totalPrice = totalPrice;
+    bill=await Bill.create(bill)
+    return bill
+  }
+  static async sendBillEmail(bill,user){
+
+    const billTable=await billMiddlware.createBillTable(bill)
+    // Nodemailer configuration
+    const transporter=nodemailer.createTransport({
+      service:'gmail',
+      auth:{
+      user:process.env.UESR_NAME,
+      pass:process.env.APP_PASSWORD
+    }
+  })
+// Email options
+const mailOptions = {
+from: 'ai-commerce',
+to: user.email,
+subject: 'Bill Details',
+html: billTable
+};
+
+// Send email
+transporter.sendMail(mailOptions, (error, info) => {
+if (error) {
+  console.error('Error sending email:', error);
+} else {
+  console.log('Email sent:', info.response);
+}
+});
+  }
+  static async createBillTable(bill) {
+    let table = `
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Size</th>
+                </tr>
+            </thead>
+            <tbody>
+    `;
+
+    for (const product of bill.products) {
+        const a = await Product.findById(product.productId);
+        table += `
+            <tr>
+                <td>${a.name}</td>
+                <td>${product.price}</td>
+                <td>${product.quantity.quantity}</td>
+                <td>${product.quantity.size}</td>
+            </tr>
+        `;
+    }
+
+    table += `
+            </tbody>
+        </table>
+    `;
+
+    return table;
+}
+
+  static calculateTotalPrice(bill, products) {
+    let totalPrice = 0;
+    for (let product of products) {
+      const foundProduct = bill.products.find((p) =>
+        p.productId.equals(product._id)
+      );
+      if (foundProduct) {
+        for (let quantity of foundProduct.quantities) {
+          totalPrice += product.price * quantity.quantity;
+        }
+      }
+    }
+    return totalPrice;
+  }
+}
+module.exports = billMiddlware;
+
+--------new file--------
+server\middlewares\productMiddleware.js
+const Product = require("../models/productModel");
+const path = require("path");
+const fs = require("fs");
+const { promisify } = require("util");
+const mkdir = promisify(fs.mkdir);
+const axios = require("axios");
+const writeFile = promisify(fs.writeFile);
+const access = promisify(fs.access);
+const unlink = promisify(fs.unlink);
+const { throwError } = require("../errorHandler");
+const FormData = require("form-data");
+class productMiddleware {
+  static async getRandomProducts(batch) {
+    console.log(batch);
+    const batchSize = 10;
+    let skipCount = 0;
+    if (batch > 1) {
+      skipCount = (batch - 1) * batchSize;
+    }
+
+    const products = await Product.find()
+      .sort({ createdAt: -1 }) // Sort by createdAt field in descending order (newest to oldest)
+      .skip(skipCount) // Skip products based on batch number
+      .limit(batchSize); // Limit the number of products to fetch
+
+    return products;
+  }
+  static extractImagesNames(similarities) {
+    for (let similarity of similarities)
+      similarity[0] = similarity[0].split("\\")[2];
+
+    return similarities;
+  }
+  static async matchProductsByImages(similarities) {
+    let products = [];
+    for (let similarity of similarities) {
+      let product = await Product.findOne({
+        imagesNames: { $in: [similarity[0]] },
+      });
+      products.push({ product, probability: similarity[1] });
+    }
+    products = products.map((element) => ({
+      _id: element.product._id,
+      publisherId: element.product.publisherId,
+      name: element.product.name,
+      price: element.product.price,
+      description: element.product.description,
+      category: element.product.category,
+      imagesNames: element.product.imagesNames,
+      quantities: element.product.quantities,
+      createdAt:element.product.createdAt
+    }));
+    // products=products.map(element=>({... element.product}))
+    return products;
+  }
+  static async sendFile(filePath) {
+    const formData = new FormData();
+    formData.append("file", fs.createReadStream(filePath));
+    console.log({ ...formData.getHeaders() });
+    const response = await axios.post(process.env.SIMILARITY_URL, formData, {
+      headers: {
+        ...formData.getHeaders(),
+        Authorization: `Bearer ${process.env.SERVER_TOKEN}`,
+      },
+    });
+    return response.data.similarities;
+  }
+  static subtractQuantities(product, quantities) {
+    for (let { size, quantity } of quantities) {
+      const existingQuantityIndex = product.quantities.findIndex(
+        (q) => q.size === size
+      );
+      if (existingQuantityIndex !== -1) {
+        product.quantities[existingQuantityIndex].quantity -= quantity;
+      }
+    }
+    return product;
+  }
+  // static async checkForQuantity(product, quantities) {
+  //     for (let { size, quantity } of quantities) {
+  //         const availableQuantity = product.quantities.find(q => q.size === size)?.quantity;
+  //         if (!availableQuantity || availableQuantity < quantity) {
+  //             throwError(`Insufficient quantity available for product: ${product.name}`, 400);
+  //         }
+  //     }
+  // }
+  static makeConditions(category, max, min) {
+    let conditions = {};
+    if (category) conditions.category = category;
+    if (max || min) {
+      conditions.price = {};
+
+      if (max) {
+        conditions.price.$lt = max;
+      }
+
+      if (min) {
+        conditions.price.$gt = min;
+      }
+    }
+    return conditions;
+  }
+
+  static async deleteImages(product, imagesNames) {
+    const allIncluded = imagesNames.every((imageName) =>
+      product.imagesNames.includes(imageName)
+    );
+
+    if (!allIncluded)
+      return throwError(
+        "the images you sent do not match with the products images",
+        403
+      );
+
+    let dirName = path.join(__dirname, "..", "uploads", product.id);
+    for (const imageName of imagesNames) {
+      const imagePath = path.join(dirName, imageName);
+      await access(imagePath).catch((err) =>
+        throwError(`images ${imageName} was not found`, 404)
+      ); // Check if the image exists
+      await unlink(imagePath).catch((err) =>
+        throwError(`could not delete image ${imageName}`, 400)
+      ); // Delete the image
+
+      const index = product.imagesNames.indexOf(imageName);
+      if (index !== -1) product.imagesNames.splice(index, 1); // Remove image name from product.imagesNames
+    }
+    return product;
+  }
+  static async checkProductsQuantities(bill) {
+    let updatedProducts = [];
+    for (let item of bill.products) {
+      let product = await Product.findById(item.productId);
+      if (!product) {
+        throwError(`Product with ID ${item.productId} was not found`, 404);
+      }
+      for (let quantity of product.quantities) {
+        if (quantity.size === item.quantity.size) {
+          if (!quantity.quantity) {
+            throwError(`there is no items of this size left`, 404);
+          }
+
+          quantity.quantity = quantity.quantity - item.quantity.quantity;
+          if (quantity.quantity < 0) {
+            throwError(`the requested qunatity does not exist`, 404);
+          }
+        }
+      }
+      await product.save(); // Save the updated product
+      updatedProducts.push(product);
+    }
+    return updatedProducts;
+  }
+  static async updateProduct(query, product) {
+    if (query.name) {
+      product.name = query.name;
+    }
+
+    if (query.price) {
+      product.previousPrice = product.price;
+      product.price = query.price;
+    }
+
+    if (query.description) {
+      product.description = query.description;
+    }
+
+    if (query.category) {
+      product.category = query.category;
+    }
+
+    if (query.quantities) {
+      // Assuming query.quantities is an array of size-quantity pairs
+      query.quantities.forEach((updatedQuantity) => {
+        const existingQuantity = product.quantities.find(
+          (q) => q.size === updatedQuantity.size
+        );
+        if (existingQuantity) {
+          existingQuantity.quantity = updatedQuantity.quantity;
+        } else {
+          // If the size doesn't exist, you might want to add it
+          product.quantities.push(updatedQuantity);
+        }
+      });
+    }
+
+    return product;
+  }
+  static async saveImages(imagespaths, images) {
+    if (imagespaths.length !== images.length)
+      throwError("error handling images", 400);
+    imagespaths.forEach(async (path, i) => {
+      await fs.writeFile(path, images[i]);
+      let buffer = path.split("/");
+      const imageName = buffer[buffer.length - 1];
+      console.log("imageName", imageName);
+      product.imagesNames.push(imageName);
+      await product.save();
+    });
+    return product;
+  }
+  static genImageName() {
+    return `${Date.now()}-${Math.floor(Math.random() * 10000000)}`;
+  }
+  static async generateImagesPath(files, productId) {
+    const dirPath = path.join(__dirname, "..", "uploads", productId);
+    await mkdir(dirPath, { recursive: true });
+    let imagespaths = [];
+    files.forEach(async (file) => {
+      const imageName = productMiddleware.genImageName();
+      const imagePath = path.join(dirPath, imageName);
+      imagespaths.push(imagePath);
+    });
+    return imagespaths;
+  }
+  static async validateProduct_preInit(product) {
+    try {
+      // Check if all required fields are present
+      const requiredFields = [
+        "name",
+        "price",
+        "description",
+        "category",
+        "imagesUrls",
+        "quantity",
+        "createdAt",
+      ];
+      for (const field of requiredFields) {
+        if (!product.hasOwnProperty(field)) {
+          throwError(`Field '${field}' is missing.`, 404);
+        }
+      }
+
+      // Check data types and constraints
+      if (!Array.isArray(product.attributes)) {
+        throw new Error(`'attributes' must be an array.`);
+      }
+      if (typeof product.name !== "string") {
+        throw new Error(`'name' must be a string.`);
+      }
+      if (
+        typeof product.price !== "number" ||
+        isNaN(product.price) ||
+        product.price <= 0
+      ) {
+        throw new Error(`'price' must be a positive number.`);
+      }
+      if (typeof product.description !== "string") {
+        throw new Error(`'description' must be a string.`);
+      }
+      if (typeof product.category !== "string") {
+        throw new Error(`'category' must be a string.`);
+      }
+      if (
+        !Array.isArray(product.imagesUrls) ||
+        product.imagesUrls.some((url) => typeof url !== "string")
+      ) {
+        throw new Error(`'imagesUrls' must be an array of strings.`);
+      }
+      for (const { size, quantity } of product.quantities) {
+        if (
+          typeof size !== "string" ||
+          !["XS", "S", "L", "XL", "XXL", "XXXL"].includes(size)
+        ) {
+          throw new Error(`Invalid size '${size}'.`);
+        }
+        if (typeof quantity !== "number" || isNaN(quantity) || quantity < 0) {
+          throw new Error(`Invalid quantity '${quantity}'.`);
+        }
+      }
+      if (!(product.createdAt instanceof Date && !isNaN(product.createdAt))) {
+        throw new Error(`'createdAt' must be a valid Date object.`);
+      }
+
+      // Additional custom validations can be added here
+
+      // If all validations pass, return true
+      return true;
+    } catch (error) {
+      // If any validation fails, throw an error
+      let err = new Error(`Validation Error: ${error.message}`);
+      err.userError = true;
+      err.status = 403;
+      throw err;
+    }
+  }
+}
+module.exports = productMiddleware;
+
+--------new file--------
+server\middlewares\userMiddleware.js
+const User=require('../models/userModel.js')
+const {throwError}=require('../errorHandler');
+const billMiddlware = require('./billMiddleware.js');
+class userMiddleware{
+    constructor (){
+
+    }
+  
+    static async addPurchasedProducts(user, products) {
+      try {
+          for (let { _id, purchasedQuantities } of products) {
+              const purchasedProduct = { productId: _id, quantities: purchasedQuantities };
+              user.purchasedProducts.push(purchasedProduct);
+          }
+          return user;
+      } catch (error) {
+          throwError('Error adding purchased products to user', 500);
+      }
+  }
+    static async addPublishedProduct(user,productId,quantity){
+      user.publishedProducts.push(productId)
+      
+      await user.save()
+      console.log(user.publishedProducts)
+      return user
+    }
+    static async findUserById(userId) {
+      const user = await User.findById(userId);
+      if (!user) 
+        throwError('no user was found',404)
+      
+      return user; // This won't be reached if an error is thrown
+  }
+    static async toggleAdmin(user){
+      if(user.role==='customer')
+       {
+         user.role='admin'
+        await user.save()
+        return user
+       }
+       if(user.role==='admin'){
+        user.role='customer'
+        await user.save()
+        return user
+       }
+
+    }
+    static async set_manager(id){
+      try
+      {
+        const user=await User.findById(id)
+        if(!user)
+          throw new Error({success:false,message:"no user was found of this id"})
+        user.role='manager'
+        await user.save()
+      
+        return user
+      }
+      catch(error){
+        throw error
+      }
+    }
+    static async pushCodeIntoUserDoc(code, user) {
+      try {
+        // Push the code into the verificationCodes array of the user document
+        user.verificationCodes.push({ code });
+    
+        // Save the updated user document
+        await user.save();
+    
+        // Return a success message or any relevant data
+        return "Verification code pushed into user document successfully";
+      } catch (error) {
+        console.error(error);
+        throw new Error("Failed to push verification code into user document");
+      }
+    }
+    
+    static async findUserByEmail(email){
+        try{
+            const user=await User.findOne({email})
+            if(!user)
+              throwError('this email does not exist',404)
+            return user
+        }
+        catch(error)
+{
+    console.error(error)
+    throw error
+}
+    }
+     static async createUser(userData) {
+        try {
+          const user = await User.create(userData);
+          return user;
+        } catch (error) {
+          throw error
+        }
+      }
+      
+}
+module.exports=userMiddleware
+--------new file--------
+server\models\billModel.js
+const mongoose = require("mongoose");
+
+const billSchema = new mongoose.Schema({
+  totalPrice:{
+    type:String,
+    required:true
+  },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+  },
+  products: [
+    {
+      price:{
+        required:true,
+        type:String
+      },
+     productId:{ type: mongoose.Schema.Types.ObjectId,
+      ref: "Product",
+      required: true},
+      quantity: 
+        {
+          size: {
+            type: String,
+            required: true,
+            enum: ["XS", "S", "L", "XL", "XXL", "XXXL"],
+          },
+          quantity: {
+            type: Number,
+            required: true,
+            min: 0,
+          },
+        },
+    
+    },
+  ],
+  paymentStatus: {
+    type: String,
+    enum: ["paid", "pending"],
+    default: "pending",
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now(),
+  },
+});
+
+const Bill = mongoose.model("Bill", billSchema);
+
+module.exports = Bill;
+
+--------new file--------
+server\models\productModel.js
+const mongoose = require("mongoose");
+
+const productSchema = new mongoose.Schema({
+  publisherId: { type: mongoose.SchemaTypes.ObjectId, ref: "User" },
+  name: {
+    type: String,
+    required: true,
+  },
+  previousPrice: Number,
+  price: {
+    type: Number,
+    required: true,
+  },
+  description: {
+    type: String,
+  },
+  category: {
+    type: String,
+    required: true,
+    enum: [
+      "T-Shirt",
+      "Shoes",
+      "Shorts",
+      "Shirt",
+      "Pants",
+      "Other",
+      "Top",
+      "Outwear",
+      "Dress",
+      "Body",
+      "Longsleeve",
+      "Undershirt",
+      "Hat",
+      "Polo",
+      "Blouse",
+      "Hoodie",
+      "Skip",
+      "Blazer",
+      "Skirt",
+    ],
+  },
+  imagesNames: [
+    {
+      type: String,
+      required: true,
+    },
+  ],
+  quantities: [
+    {
+      size: {
+        type: String,
+        required: true,
+        enum: ["XS", "S", "L", "XL", "XXL", "XXXL"],
+      },
+      quantity: {
+        type: Number,
+        required: true,
+        min: 0,
+      },
+    },
+  ],
+  createdAt: {
+    type: Date,
+    default: Date.now(),
+  },
+});
+
+const Product = mongoose.model("Product", productSchema);
+
+module.exports = Product;
+
+--------new file--------
+server\models\userModel.js
+const mongoose = require("mongoose");
+
+const userSchema = new mongoose.Schema({
+  publishedProducts: [{ type: mongoose.SchemaTypes.ObjectId, ref: "Product" }],
+  role: {
+    type: String,
+    required: true,
+    default: "customer",
+    emun: ["customer", "admin", "manager"],
+  },
+  name: {
+    type: String,
+    required: true,
+  },
+  password: {
+    type: String,
+    required: true,
+  },
+  location: {
+    country: { type: String, required: true },
+    city: { required: true, type: String },
+    address: { type: String, required: true },
+  },
+  email: {
+    type: String,
+    required: true,
+    match: [
+      /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+      "Please enter a valid email address",
+    ],
+    unique: true,
+  },
+  paymentInformation: {
+    type: String,
+  },
+  bills: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Bill",
+    },
+  ],
+  verificationCodes: [
+    {
+      code: Number,
+      createdAt: {
+        requried: true,
+        type: Date,
+        default: Date.now(),
+      },
+    },
+  ],
+});
+
+const User = mongoose.model("User", userSchema);
+
+module.exports = User;
+
+--------new file--------
+server\routes\productRoutes.js
+const productController=require('../controllers/productController')
+const express=require('express')
+const router=express.Router()
+router.post('/',productController.createProduct)
+router.get('/get-image',productController.getImage)
+router.get('/get-random-products',productController.getRandomProducts)
+router.get('/',productController.getProducts)
+router.get('/:productId',productController.getProduct)
+router.patch('/',productController.updateProduct)
+router.delete('/',productController.deleteProduct)
+router.post('/search-by-image',productController.searchByImage)
+module.exports=router
+--------new file--------
+server\routes\userRoutes.js
+const userController=require('../controllers/userController')
+const express=require('express')
+router=express.Router()
+router.get('/validate-token',userController.validateToken)
+router.post('/',userController.createAccount)
+router.get('/login',userController.loginUser)
+router.get('/recover-account',userController.createVerificationCode)
+router.post('/recover-account',userController.checkVerificationAccount)
+router.get('/login-manager',userController.login_admin)
+router.patch("/toggle-admin",userController.toggleAdmin)
+router.get("/get-admins",userController.getAdmins)
+router.get("/get-countries",userController.getCountries)
+router.get("/get-cities",userController.getCities)
+router.post('/buy',userController.buyProduct)
+router.patch('/reset-password',userController.resetPassword)
+module.exports=router
+
+--------new file--------
+server\script.js
+const fs = require('fs');
+const csv = require('csv-parser');
+const mongoose = require("mongoose");
+const Product = require('./models/productModel'); // Assuming your product model is in this path
+const path = require('path');
+const xlsx = require('xlsx');
+// mongoose.connect('mongodb://127.0.0.1:27017/ai-commerce', {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true
+// }).then(() => {
+//   console.log("Connected to MongoDB");
+//   // createProducts();
+//   createCsv()
+// }).catch(err => {
+//   console.error("Error connecting to MongoDB:", err);
+// });
+
+// // CSV file path
+const filePath = '../dataset/images.csv';
+function getHeaders(){
+
+  // Create a readable stream to read the CSV file
+  const readableStream = fs.createReadStream(filePath);
+
+  // Pipe the readable stream to csv-parser to parse the CSV file
+readableStream.pipe(csv())
+  .on('headers', (headers) => {
+    console.log('CSV file headers:', headers);
+  })
+  .on('error', (error) => {
+    console.error('Error reading CSV file:', error);
+  });
+}
+// getHeaders()
+function getLabels()
+{// Array to store label values
+  const labels = [];
+  
+  // Create a readable stream to read the CSV file
+  const readableStream = fs.createReadStream(filePath);
+  
+  // Pipe the readable stream to csv-parser to parse the CSV file
+readableStream.pipe(csv())
+  .on('data', (row) => {
+    // Extract the value of the 'label' column from the row
+    const labelValue = row['label'];
+    // Push the label value to the labels array
+    labels.push(labelValue);
+  })
+  .on('end', () => {
+    // Log the unique label values to the console
+    const uniqueLabels = [...new Set(labels)]; // Get unique label values
+    console.log('Unique label values:', uniqueLabels);
+  })
+  .on('error', (error) => {
+    console.error('Error reading CSV file:', error);
+  });}
+  // getLabels()
+  
+  async function createProducts() {
+    try {
+      // Read the CSV file
+      const products = [];
+      fs.createReadStream(filePath)
+        .pipe(csv())
+        .on('data', (row) => {
+          // Check if the image file exists
+          const imagePath = `../dataset/images/${row.image}.jpg`; // Assuming the images have '.jpg' extension
+          if (fs.existsSync(imagePath) && row.label !== 'Not sure') {
+            // Construct product object
+            const product = {
+              publisherId: "65e2d13883fc262e382a169f",
+              reviews: [],
+              name: row.label,
+              price: Math.floor(Math.random() * 96) + 5, // Random price between 5 and 100
+              description: "",
+              category: row.label,
+              imagesNames: [row.image],
+              quantities: generateRandomQuantities(),
+              createdAt: Date.now()
+            };
+            products.push(product);
+          } else {
+            console.log(`Skipping product "${row.label}" because image doesn't exist or label is "Not sure"`);
+          }
+        })
+        .on('end', async () => {
+          console.log(products[0])
+          // Save products to MongoDB
+          const savedProducts = await Product.insertMany(products);
+          console.log("Products saved to MongoDB:", savedProducts);
+          
+          // Create folders and save images
+          savedProducts.forEach(product => {
+            const productId = product._id.toString();
+            const folderPath = `data/${productId}`;
+            fs.mkdirSync(folderPath);
+            fs.copyFileSync(`../dataset/images/${product.imagesNames[0]}.jpg`, `${folderPath}/${product.imagesNames[0]}.jpg`);
+            console.log(`Image for product ${product.name} saved to ${folderPath}`);
+          });
+        });
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  }
+
+// Function to generate random quantities
+function generateRandomQuantities() {
+  const sizes = ["XS", "S", "L", "XL", "XXL", "XXXL"];
+  return sizes.map(size => ({
+    size,
+    quantity: Math.floor(Math.random() * 21) // Random quantity between 0 and 20
+  }));
+}
+async function createCsv(){
+  let products=await Product.find()
+  let csvFile=[]
+  for (let product of products){
+    csvFile.push({label:product.category,path:path.join('./','data',product.id,product.imagesNames[0])})
+  }
+  console.log(console.log(csvFile[6]))
+    // Prepare CSV content
+    let csvContent = 'label,path\n';
+    csvFile.forEach(row => {
+      csvContent += `${row.label},${row.path}\n`;
+    });
+
+    // Define CSV file path
+    const csvFilePath = './product_paths.csv';
+
+    // Write CSV file
+    fs.writeFileSync(csvFilePath, csvContent);
+
+    // console.log('CSV file created:', csvFilePath);
+  
+  }
+
+// Call the function to create products
+function acheck(){
+  let x=true
+  let y=true
+  let z=false
+  let u=true
+  let w=true
+  expression=((x|| !y)&&(y||z)&&(!z)&&(!x||!y||u)&&(!x||!y||u)&&(!x||!y||!u||w))
+  console.log(expression)
+
+}
+// acheck()
+
+function getCountriesAndCities() {
+  // Read the Excel file
+  let workbook = xlsx.readFile('./worldcities.xlsx');
+
+  // Assuming the data is in the first sheet
+  let sheetName = workbook.SheetNames[0];
+  let sheet = workbook.Sheets[sheetName];
+
+  // Convert the sheet data to JSON
+  let data = xlsx.utils.sheet_to_json(sheet);
+
+  // Organize data into the desired format
+  let countriesAndCities = {};
+
+  data.forEach(row => {
+      let country = row.country;
+      let city = row.city;
+
+      if (!countriesAndCities[country]) {
+          countriesAndCities[country] = [];
+      }
+
+      countriesAndCities[country].push(city);
+  });
+
+  // Convert to the final format
+  let countriesAndCitiesArray = [];
+
+  for (let country in countriesAndCities) {
+      countriesAndCitiesArray.push({
+          country: country,
+          cities: countriesAndCities[country]
+      });
+  }
+
+  return countriesAndCitiesArray;
+}
+
+// Write the data to a JSON file
+function writeToFile(data) {
+  fs.writeFileSync('countries_and_cities.json', JSON.stringify(data, null, 2));
+}
+
+// Usage
+let countriesAndCities = getCountriesAndCities();
+// writeToFile(countriesAndCities);
+function updateImagesNames(){
+  
+}
+--------new file--------
+server\testScript.js
+Sehr geehrte Damen und Herren 
+ich habe Ihre Anzeige gesehen und daraufhin habe ich mich beschlossen Ihren Sprachkurs auszuprobieren 
+leider entsprach meine Erfahrung dem Inserat nicht deswegen schreibe ich Ihnen diese Beschwerde. 
+Zuerst hatte ich die Absicht mit anderen Gespräche zu führen was unmöglich war weil viele der studenten  auf verschiedenen Sprachniveaus waren. 
+Eindeutig ist es um man sich an irgendwelchen Kurs zu beteiligen 
+sollte man über die angelegten Bücher verfügen 
+trotzdem standen mir keine Lernmaterialien  zur Verfügung weil ich mir sie einfach nicht leisten konnte. 
+Die Unterricht waren langsam wiederholt und nicht herausfordernd
+ Pünktlichkeit spielt eine zentrale Rolle in meinem Leben darum die Verspätung Ihres Beraters hat mich sehr geargert.
+ Solche fehlende Ehrlichkeiten haben mich enttäuscht.
+  Aus diesem Grund würde ich niemandem Ihren Kurs empfehlen. 
+ Mit freundlichen Grüßen Sami Khalil
+--------new file--------

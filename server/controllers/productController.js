@@ -1,6 +1,7 @@
 const Product = require("../models/productModel");
 const productMiddleware = require("../middlewares/productMiddleware");
 const User = require("../models/userModel");
+const mongoose = require("mongoose");
 const fs = require("fs");
 const formData = require("form-data");
 const multer = require("multer");
@@ -9,7 +10,11 @@ const authentication = require("../middlewares/authentication");
 const userMiddleware = require("../middlewares/userMiddleware");
 const { handleError, throwError } = require("../errorHandler");
 const { promisify } = require("util");
-const access = promisify(fs.access, fs.writeFile);
+const access = promisify(fs.access);
+const writeFile=promisify(fs.writeFile)
+const readFile=promisify(fs.readFile)
+const mkdir=promisify(fs.mkdir)
+const rename=promisify(fs.rename)
 const path = require("path");
 class productController {
   static async getRandomProducts(req, res) {
@@ -25,36 +30,6 @@ class productController {
   }
   static async searchByImage(req, res) {
     try {
-      //             let data = '';
-
-      //   req.on('data', chunk => {
-      //     data += chunk;
-      //   });
-
-      //   req.on('end', async() => {
-      //     // Parse the multipart form data
-      //     const boundary = req.headers['content-type'].split('boundary=')[1];
-      //     const parts = data.split(`--${boundary}`);
-
-      //     // Iterate over each part of the form data
-      //     for (let i = 0; i < parts.length - 1; i++) {
-      //       // Extract the filename if present
-      //       const filenameMatch = parts[i].match(/filename="(.+?)"/);
-      //       const filename = filenameMatch ? filenameMatch[1] : 'No filename provided';
-
-      //       // Extract the content of the part
-      //       const contentMatch = parts[i].match(/\r\n\r\n([\s\S]*)$/);
-      //       const content = contentMatch ? contentMatch[1] : '';
-
-      //       // Save the content to a file
-      //       if (filename !== 'No filename provided' && content) {
-      //         const filePath = path.join(uploadsDir, filename);
-      //        await fs.writeFile(filePath, content);
-      //         console.log(`File saved: ${filePath}`);
-      //       }
-      //     }
-
-      //   });
       const { userId } = await authentication.validateToken(
         req.headers["token"]
       );
@@ -64,7 +39,6 @@ class productController {
       if (!fs.existsSync(uploadDir)) {
         fs.mkdirSync(uploadDir, { recursive: true });
       }
-      console.log(req.files)
 
       const storage = multer.diskStorage({
         destination: function (req, file, cb) {
@@ -89,7 +63,7 @@ class productController {
         let similarities = await productMiddleware.sendFile(filePath);
         // Respond with a success message
         console.log(similarities);
-        similarities =  productMiddleware.extractImagesNames(similarities);
+        similarities = productMiddleware.extractImagesNames(similarities);
         const results = await productMiddleware.matchProductsByImages(
           similarities
         );
@@ -170,15 +144,14 @@ class productController {
   }
   static async getProducts(req, res) {
     try {
-      console.log(req.query['search'])
-       if(!Object.keys(req.query).some(el=>req.query[el]?true:false))
-        throwError('specify what you are looking for',400)
-      const batchSize = 10;
-      let skipCount = 0;
-      const {batch}=req.query
-      if (batch > 1) {
-          skipCount = (batch - 1) * batchSize;
-      }
+      if (!Object.keys(req.query).some((el) => (req.query[el] ? true : false)))
+        throwError("specify what you are looking for", 400);
+      // const batchSize = 10;
+      // let skipCount = 0;
+      // const { batch } = req.query;
+      // if (batch > 1) {
+      //   skipCount = (batch - 1) * batchSize;
+      // }
       const conditions = productMiddleware.makeConditions(
         req.query?.category,
         req.query?.max,
@@ -191,9 +164,12 @@ class productController {
       let regex;
 
       if (searchQuery) {
-        const escapedSearchQuery = searchQuery.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+        const escapedSearchQuery = searchQuery.replace(
+          /[-[\]{}()*+?.,\\^$|#\s]/g,
+          "\\$&"
+        );
         regex = new RegExp(escapedSearchQuery, "gi");
-    }
+      }
       let results = [];
       // Include the search query conditions if it exists
       if (searchQuery) {
@@ -210,25 +186,23 @@ class productController {
       // Filter out duplicate places
       console.log(results.length);
       const uniqueResults = {};
-      
-      const products = await Product.find({ $and: [conditions,query,{}] })
-      .limit(10)
-      .sort({ createdAt: -1 }) // Sort by createdAt field in descending order (newest to oldest)
-                .skip(skipCount) // Skip products based on batch number
-                .limit(batchSize); // Limit the number of products to fetch
-    
+      console.log(req.query)
+      const products = await Product.find({ $and: [conditions, query, {}] })
+        .limit(20)
+        .sort({ createdAt: -1 }) // Sort by createdAt field in descending order (newest to oldest)
+
       if (!products.length) return throwError("no products were found ", 404);
       products.forEach((product) => {
         if (!uniqueResults[product._id]) {
           uniqueResults[product._id] = product;
         }
       });
-      return res.json({ length:products.length,success: true, products });
+      return res.json({ length: products.length, success: true, products });
     } catch (err) {
       handleError(err, res);
     }
   }
-  
+
   static async getProduct(req, res) {
     try {
       const token = await authentication.validateToken(req.headers["token"]);
@@ -269,34 +243,61 @@ class productController {
   }
   static async createProduct(req, res) {
     try {
-      const { userId } = await authentication.validateToken(
-        req.headers["token"]
-      );
-      const user = await userMiddleware.findUserById(userId);
-      if (user.role !== "admin" || user.role !== "manager")
-        throwError("you do not have authority lol", 403);
-      let product = req.body;
-      product.publisherId = userId;
-      if (!req.files.length) throwError("you must add images", 403);
-      await productMiddleware.validateProduct_preInit(product);
-      // do some stuff on it later to be added
-      product = await Product.create(product);
-      user = await userMiddleware.addPublishedProduct(user, product.id);
-      const images = [];
-      const imagespaths = await productMiddleware.generateImagesPath(
-        req.files,
-        product.id
-      );
-      product = await productMiddleware.saveImages(
-        imagespaths,
-        req.files,
-        product
-      );
-
-      return res.json({ success: true, product });
+      req.imagesNames = [];
+      await   productController.deleteAllFiles(path.join('./temp')) 
+      const {userId}=await authentication.validateToken(req.headers['token'])
+      const user=await User.findById(userId)
+      if(user.role!=='admin' && user.role!=='manager')
+          throwError('you are niether an admin or a manager',403)
+        const storage = multer.diskStorage({
+          destination:  function (req, file, cb) {
+            cb(null, path.join('./','temp')); // Specify a dedicated upload folder
+          },
+          filename:async function (req, file, cb) {
+            
+            const imageName = Date.now() + path.extname(file.originalname);
+            req.imagesNames.push(imageName)
+            cb(null, imageName);
+          },
+        });
+        const upload = multer({ storage }).array("files");
+        
+        // Handle the upload asynchronously (if needed)
+        await upload(req, res, async (err) => {
+          if (err) {
+            console.error("Error uploading file:", err);
+            throwError('error uploading the files',500)
+          }
+          const productData=JSON.parse(req.body.product)
+          // console.log(productData)
+          const newProduct=new Product({... productData})
+          newProduct.quantities=productData.quantities
+          newProduct.imagesNames=req.imagesNames
+          await productController.moveFiles(newProduct.id)
+          // await newProduct.save()
+          return res.json({ success: true,newProduct }); // Include uploaded files info in response
+        });
+        
     } catch (err) {
       handleError(err, res);
     }
   }
+  static async  moveFiles(productId) {
+    const destinationDir = path.join('./s', productId); // Create directory based on product ID
+    await fs.promises.mkdir(destinationDir, { recursive: true }); // Ensure directory exists
+    const filesNames= await fs.promises.readdir(path.join('./','temp'))
+    for (const fileName of filesNames) {
+      const finalPath = path.join(destinationDir, fileName);
+      await fs.promises.rename(path.join('./','temp',fileName), finalPath); // Move each file
+    }
+  }
+  static async  deleteAllFiles(directoryPath) {
+  const files = await fs.promises.readdir(directoryPath); // List files asynchronously
+
+  for (const file of files) {
+    const filePath = path.join(directoryPath, file);
+    await fs.promises.unlink(filePath); // Delete each file asynchronously
+  }
+}
 }
 module.exports = productController;

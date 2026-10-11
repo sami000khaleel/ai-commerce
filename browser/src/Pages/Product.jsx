@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import api from "../api/api";
-import {signal} from '@preact/signals-react'
+import { signal } from "@preact/signals-react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import ModalPopup from "../components/ModalPopup/ModalPopup";
 import A1 from "../assets/images/marcus-loke-xXJ6utyoSw0-unsplash.jpg";
@@ -11,8 +11,9 @@ import A5 from "../assets/images/sarah-dorweiler-gUPiTDBdRe4-unsplash.jpg";
 import ImagesSlider from "../components/ImagesSlider/ImagesSlider";
 import { useOutletContext } from "react-router-dom";
 import { itemsCountSignal } from "../App";
+import Cookies from "js-cookies";
 const Product = () => {
-  const {setItemsCount}=useOutletContext()
+  const { setItemsCount } = useOutletContext();
   const navigate = useNavigate();
   const [timeOutId, setTimeoutId] = useState(null);
   const [size, setSize] = useState({ size: null, quantity: null });
@@ -25,13 +26,19 @@ const Product = () => {
     hideFlag: true,
     errorFlag: false,
   });
-  useEffect(()=>window.scrollTo({top:0,behavior:'smooth'}),[])
+  useEffect(() => {
+    function checkUesr(params) {
+      !Cookies.getItem("token") && navigate("/home");
+   
+    }
+    checkUesr()
+  }, []);
+  useEffect(() => window.scrollTo({ top: 0, behavior: "smooth" }), []);
   function addToCart(productId, size, price) {
     let cartProducts = JSON.parse(localStorage.getItem("cart")) || [];
     // Check if the item already exists in the cart
     const existingItemIndex = cartProducts.findIndex(
-      (item) =>
-        item.product._id === productId && item.size === size
+      (item) => item.product._id === productId && item.size === size
     );
     for (let element of product.quantities)
       if (size === element.size) {
@@ -71,8 +78,8 @@ const Product = () => {
       hideFlag: false,
       errorFlag: false,
     });
-    setItemsCount(pre=>pre+1)
-    itemsCountSignal.value=JSON.parse(localStorage.getItem('cart')).length
+    setItemsCount((pre) => pre + 1);
+    itemsCountSignal.value = JSON.parse(localStorage.getItem("cart")).length;
   }
   useEffect(() => {
     const fetchProduct = async () => {
@@ -137,7 +144,10 @@ const Product = () => {
           ]}
         />
       </section>
-      <section className="w-full gap-3 md:w-[45%]  flex flex-col justify-center  items-start" id="product-details">
+      <section
+        className="w-full gap-3 md:w-[45%]  flex flex-col justify-center  items-start"
+        id="product-details"
+      >
         <h1 className="text-4xl">{product.name}</h1>
         <p>{product.category}</p>
         <article
@@ -150,17 +160,32 @@ const Product = () => {
               disabled={quantity?.quantity > 0 ? false : true}
               onClick={(e) => handleSizeClicked(quantity, e)}
               aria-label={`size ${quantity.size}`}
-              className={`${quantity.size == size.size ? 'bg-black text-white' : null} p-3 my-3 ${quantity?.quantity > 0 ? 'hover:bg-[rgb(223,223,223)]' : 'cursor-not-allowed'} aspect-square border mr-4`}
+              className={`${
+                quantity.size == size.size ? "bg-black text-white" : null
+              } p-3 my-3 ${
+                quantity?.quantity > 0
+                  ? "hover:bg-[rgb(223,223,223)]"
+                  : "cursor-not-allowed"
+              } aspect-square border mr-4`}
               key={index}
             >
               {quantity.size}
             </button>
           ))}
         </article>
-        <button onClick={handleAddToCart} className={`${!size.size ? 'cursor-not-allowed' : null} text-white px-5 aspect-[4/2] hover:bg-[rgb(130,129,129)] rounded-lg bg-[rgb(110,110,110)]`} aria-label="add to cart">
+        <button
+          onClick={handleAddToCart}
+          className={`${
+            !size.size ? "cursor-not-allowed" : null
+          } text-white px-5 aspect-[4/2] hover:bg-[rgb(130,129,129)] rounded-lg bg-[rgb(110,110,110)]`}
+          aria-label="add to cart"
+        >
           add to cart
         </button>
-        <p>{product?.description || " this is a product description I hope you liked this website a lot"}</p>
+        <p>
+          {product?.description ||
+            " this is a product description I hope you liked this website a lot"}
+        </p>
       </section>
     </article>
   ) : (

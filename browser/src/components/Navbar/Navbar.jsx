@@ -28,7 +28,8 @@ const Navbar = ({setProducts,setModalState,modalState}) => {
 
       <section
         id="navbar"
-        className="shadow-xl px-2 sm:px-7 fixed z-50 md:px-[3rem]  flex flex-row items-center justify-between h-[64px]  top-0 w-screen bg-[#eeeeee]"
+        className=
+        "shadow-xl px-2 sm:px-7 sticky  z-50 md:px-[3rem]  flex flex-row items-center justify-between h-[64px]  top-0 w-screen bg-[#eeeeee]"
       >
            
         <a href='/home'>

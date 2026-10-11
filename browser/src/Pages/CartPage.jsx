@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate,useOutletContext } from "react-router-dom";
 import Cart from "../components/Cart/Cart";
+import Cookies from 'js-cookies'
 const CartPage = () => {
   const {setItemsCount}=useOutletContext()
   const navigate = useNavigate();
@@ -8,6 +9,7 @@ const CartPage = () => {
     JSON.parse(localStorage.getItem("cart"))
   );
   useEffect(()=>window.scrollTo({top:0,behavior:'smooth'}),[])
+  // useEffect(()=>!Cookies.getItem('token')?navigate('/home'):()=>console.log('all good'),[])
 
   useEffect(() => localStorage.setItem("cart", JSON.stringify(cart)), [cart]);
   return (

@@ -75,9 +75,8 @@ const Cart = ({ cart, setCart,setItemsCount }) => {
       {modalState.hideFlag ? null : (
         <ModalPopup modalState={modalState} setModalState={setModalState} />
       )}
-      <h1 className="">{cart.length}</h1>
       <article
-        className="flex jusctify-center gap-10 mx-10 flex-col items-center"
+        className="mt-10 flex jusctify-center gap-10 mx-10 flex-col items-center"
         id="products in cart"
       >
         <h1 className="text-4xl">Your Shopping Cart</h1>

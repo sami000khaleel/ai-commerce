@@ -2,7 +2,6 @@ const productController=require('../controllers/productController')
 const express=require('express')
 const router=express.Router()
 router.post('/',productController.createProduct)
-// to be continued
 router.get('/get-image',productController.getImage)
 router.get('/get-random-products',productController.getRandomProducts)
 router.get('/',productController.getProducts)
