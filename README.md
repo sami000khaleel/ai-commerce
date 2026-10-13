@@ -241,7 +241,6 @@ Full walkthrough (signup → browse → image search → checkout → email bill
 
 | Limitation | The fix |
 |---|---|
-| **No bcrypt on signup** | Passwords are hashed in one place but not consistently. Centralize hashing in a user middleware. |
 | **Plain HTTP for the ML service** | Should use HTTPS + mTLS between Node and Python. |
 | **No rate limiting** | Add `express-rate-limit` on auth and search endpoints. |
 | **No tests** | The bill calculator and quantity checker especially need unit tests. |
